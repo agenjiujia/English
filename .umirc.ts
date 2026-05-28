@@ -18,4 +18,5 @@ export default defineConfig({
   ],
   mfsu: false,
   title: "英语系统知识库",
+  favicons: ["/favicon.svg"],
 });
