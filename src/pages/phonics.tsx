@@ -18,6 +18,7 @@ import {
   StudyCelebration,
   useStudyCelebration,
 } from "@/components/StudyCelebration";
+import { DoubaoChatWidget } from "@/components/DoubaoChatWidget";
 import { useStudyProgress } from "@/components/StudyProgress";
 import {
   AnnotationToolbar,
@@ -590,6 +591,14 @@ function PhonicsCombinedStageCard({
 }
 
 export default function PhonicsPage() {
+  const toPath = React.useCallback((path: string) => {
+    const pathname = window.location.pathname;
+    const prefix =
+      pathname === "/English" || pathname.startsWith("/English/")
+        ? "/English"
+        : "";
+    return `${prefix}${path}`;
+  }, []);
   const annotations = useStudyAnnotations("phonics");
   const progress = useStudyProgress("phonics");
   const celebration = useStudyCelebration();
@@ -843,7 +852,7 @@ export default function PhonicsPage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = "/";
+              window.location.href = toPath("/");
             }}
           >
             返回语法知识库
@@ -851,7 +860,7 @@ export default function PhonicsPage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = "/remaining";
+              window.location.href = toPath("/remaining");
             }}
           >
             查看剩余英语能力知识点
@@ -865,6 +874,7 @@ export default function PhonicsPage() {
           clearAll={annotations.clearAll}
         />
         <StudyCelebration celebration={celebration.celebration} />
+        <DoubaoChatWidget />
         <FloatButton.BackTop />
       </Layout>
     </ConfigProvider>

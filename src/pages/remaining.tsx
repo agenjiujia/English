@@ -20,6 +20,7 @@ import {
   StudyCelebration,
   useStudyCelebration,
 } from "@/components/StudyCelebration";
+import { DoubaoChatWidget } from "@/components/DoubaoChatWidget";
 import { useStudyProgress } from "@/components/StudyProgress";
 import {
   AnnotationToolbar,
@@ -265,6 +266,14 @@ function TopicCard({
 }
 
 export default function RemainingKnowledgePage() {
+  const toPath = React.useCallback((path: string) => {
+    const pathname = window.location.pathname;
+    const prefix =
+      pathname === "/English" || pathname.startsWith("/English/")
+        ? "/English"
+        : "";
+    return `${prefix}${path}`;
+  }, []);
   const annotations = useStudyAnnotations("remaining");
   const progress = useStudyProgress("remaining");
   const celebration = useStudyCelebration();
@@ -496,7 +505,7 @@ export default function RemainingKnowledgePage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = "/";
+              window.location.href = toPath("/");
             }}
           >
             返回语法知识库
@@ -504,7 +513,7 @@ export default function RemainingKnowledgePage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = "/phonics";
+              window.location.href = toPath("/phonics");
             }}
           >
             查看自然拼读系统知识库
@@ -518,6 +527,7 @@ export default function RemainingKnowledgePage() {
           clearAll={annotations.clearAll}
         />
         <StudyCelebration celebration={celebration.celebration} />
+        <DoubaoChatWidget />
         <FloatButton.BackTop />
       </Layout>
     </ConfigProvider>

@@ -20,6 +20,7 @@ import {
   StudyCelebration,
   useStudyCelebration,
 } from "@/components/StudyCelebration";
+import { DoubaoChatWidget } from "@/components/DoubaoChatWidget";
 import { useStudyProgress } from "@/components/StudyProgress";
 import {
   AnnotationToolbar,
@@ -387,6 +388,14 @@ function TopicCard({
 }
 
 export default function GrammarHome() {
+  const toPath = React.useCallback((path: string) => {
+    const pathname = window.location.pathname;
+    const prefix =
+      pathname === "/English" || pathname.startsWith("/English/")
+        ? "/English"
+        : "";
+    return `${prefix}${path}`;
+  }, []);
   const annotations = useStudyAnnotations("grammar");
   const progress = useStudyProgress("grammar");
   const celebration = useStudyCelebration();
@@ -599,7 +608,7 @@ export default function GrammarHome() {
             type="primary"
             className="sideActionButton"
             onClick={() => {
-              window.location.href = "/remaining";
+              window.location.href = toPath("/remaining");
             }}
           >
             查看剩余英语能力知识点
@@ -608,7 +617,7 @@ export default function GrammarHome() {
             type="primary"
             className="sideActionButton"
             onClick={() => {
-              window.location.href = "/phonics";
+              window.location.href = toPath("/phonics");
             }}
           >
             查看自然拼读系统知识库
@@ -622,6 +631,7 @@ export default function GrammarHome() {
           clearAll={annotations.clearAll}
         />
         <StudyCelebration celebration={celebration.celebration} />
+        <DoubaoChatWidget />
         <FloatButton.BackTop />
       </Layout>
     </ConfigProvider>
