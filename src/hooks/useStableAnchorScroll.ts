@@ -10,15 +10,38 @@ export function useStableAnchorScroll() {
       event.preventDefault();
 
       const targetId = link.href.replace(/^#/, "");
-      const target = document.getElementById(targetId);
-      if (!target) return;
+      let attempts = 0;
+      const maxAttempts = 12;
+      const settleThreshold = 3;
+      const topOffset = 24;
 
-      const scroll = () =>
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      const run = () => {
+        const target = document.getElementById(targetId);
+        if (!target) {
+          if (attempts < maxAttempts) {
+            attempts += 1;
+            window.setTimeout(run, 80);
+          }
+          return;
+        }
 
-      scroll();
-      window.setTimeout(scroll, 120);
-      window.setTimeout(scroll, 360);
+        const top =
+          window.scrollY + target.getBoundingClientRect().top - topOffset;
+        window.scrollTo({
+          top: Math.max(top, 0),
+          behavior: attempts === 0 ? "smooth" : "auto",
+        });
+
+        const remain = Math.abs(
+          target.getBoundingClientRect().top - topOffset,
+        );
+        if (remain <= settleThreshold || attempts >= maxAttempts) return;
+
+        attempts += 1;
+        window.setTimeout(run, 90);
+      };
+
+      run();
     },
     [],
   );
