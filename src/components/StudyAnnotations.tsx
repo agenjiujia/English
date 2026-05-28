@@ -198,6 +198,24 @@ async function fetchDictionary(word: string) {
   return data;
 }
 
+async function fetchFreeChineseTranslation(text: string) {
+  const response = await fetch(
+    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=${encodeURIComponent(
+      text,
+    )}`,
+  );
+  if (!response.ok) {
+    throw new Error("翻译服务暂时不可用");
+  }
+  const data = (await response.json()) as unknown;
+  if (!Array.isArray(data) || !Array.isArray(data[0])) return "";
+  const parts = data[0]
+    .map((item) => (Array.isArray(item) ? item[0] : ""))
+    .filter((item): item is string => typeof item === "string" && Boolean(item))
+    .join("");
+  return parts.trim();
+}
+
 function getTextOffset(container: HTMLElement, node: Node, offset: number) {
   const range = document.createRange();
   range.selectNodeContents(container);
@@ -440,14 +458,23 @@ export function AnnotationToolbar({
 }) {
   const [dictionaryOpen, setDictionaryOpen] = useState(false);
   const [lookupWord, setLookupWord] = useState("");
+  const [lookupText, setLookupText] = useState("");
   const [entries, setEntries] = useState<DictionaryEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [lookupWarning, setLookupWarning] = useState("");
+  const [zhTranslation, setZhTranslation] = useState("");
+  const [zhError, setZhError] = useState("");
+  const [definitionTranslations, setDefinitionTranslations] = useState<
+    Record<string, string>
+  >({});
+  const lookupRequestRef = React.useRef(0);
 
   if (!selection && !dictionaryOpen) return null;
 
   const selectedText = selection?.text.trim() || "";
   const word = getLookupWord(selectedText);
+  const isSingleWordSelection = /^[A-Za-z][A-Za-z'-]*$/.test(selectedText);
 
   const handleSpeak = () => {
     if (!selectedText) return;
@@ -455,21 +482,93 @@ export function AnnotationToolbar({
   };
 
   const handleDictionary = async () => {
-    if (!word) {
-      setError("请选中一个英文单词后再查词。");
+    const requestId = ++lookupRequestRef.current;
+    if (!selectedText) {
+      setError("请先选中英文内容后再查词。");
       setEntries([]);
       setLookupWord("");
+      setLookupText("");
       setDictionaryOpen(true);
       return;
     }
 
     setDictionaryOpen(true);
     setLookupWord(word);
+    setLookupText(selectedText);
     setLoading(true);
     setError("");
+    setLookupWarning("");
+    setZhTranslation("");
+    setZhError("");
+    setDefinitionTranslations({});
     try {
-      const result = await fetchDictionary(word);
-      setEntries(result);
+      const translationResultPromise = fetchFreeChineseTranslation(selectedText);
+      const dictionaryResultPromise =
+        isSingleWordSelection && word
+          ? fetchDictionary(word)
+          : Promise.resolve<DictionaryEntry[]>([]);
+
+      const [dictionaryResult, translationResult] = await Promise.allSettled([
+        dictionaryResultPromise,
+        translationResultPromise,
+      ]);
+
+      const hasDictionaryResult =
+        dictionaryResult.status === "fulfilled" &&
+        dictionaryResult.value.length > 0;
+      const hasTranslationResult =
+        translationResult.status === "fulfilled" &&
+        Boolean(translationResult.value);
+
+      if (hasDictionaryResult) {
+        setEntries(dictionaryResult.value);
+      } else {
+        setEntries([]);
+        if (isSingleWordSelection) {
+          setLookupWarning("词典释义暂不可用，已尝试展示中文翻译。");
+        }
+      }
+
+      if (hasTranslationResult) {
+        setZhTranslation(translationResult.value);
+      } else if (hasDictionaryResult) {
+        setZhError("中文翻译暂不可用，已展示英文释义。");
+      }
+
+      if (!hasDictionaryResult && !hasTranslationResult) {
+        throw new Error("查词与翻译都失败了，请稍后再试。");
+      }
+
+      if (dictionaryResult.status === "fulfilled" && dictionaryResult.value.length) {
+        const texts = dictionaryResult.value
+          .flatMap((entry) => entry.meanings || [])
+          .flatMap((meaning) => meaning.definitions.slice(0, 4))
+          .flatMap((item) =>
+            [item.definition, item.example || ""].filter(Boolean),
+          );
+        const uniqueTexts = [...new Set(texts)].slice(0, 12);
+        if (uniqueTexts.length > 0) {
+          void (async () => {
+            const translated = await Promise.allSettled(
+              uniqueTexts.map(async (itemText) => ({
+                text: itemText,
+                translated: await fetchFreeChineseTranslation(itemText),
+              })),
+            );
+            if (requestId !== lookupRequestRef.current) return;
+            const mapping = translated.reduce<Record<string, string>>(
+              (result, item) => {
+                if (item.status === "fulfilled" && item.value.translated) {
+                  result[item.value.text] = item.value.translated;
+                }
+                return result;
+              },
+              {},
+            );
+            setDefinitionTranslations(mapping);
+          })();
+        }
+      }
     } catch (err) {
       setEntries([]);
       setError(err instanceof Error ? err.message : "查词失败，请稍后再试。");
@@ -583,7 +682,13 @@ export function AnnotationToolbar({
       ) : null}
 
       <Drawer
-        title={lookupWord ? `单词信息：${lookupWord}` : "单词信息"}
+        title={
+          lookupText
+            ? isSingleWordSelection && lookupWord
+              ? `单词信息：${lookupWord}`
+              : "句子翻译"
+            : "单词信息"
+        }
         open={dictionaryOpen}
         width={420}
         onClose={() => setDictionaryOpen(false)}
@@ -594,30 +699,57 @@ export function AnnotationToolbar({
           </div>
         ) : error ? (
           <Alert type="warning" showIcon message={error} />
-        ) : entries.length > 0 ? (
+        ) : entries.length > 0 || zhTranslation || zhError ? (
           <div className="dictionaryPanel">
-            <Space align="center" wrap>
-              <span className="dictionaryWord">{entries[0].word}</span>
-              {entries
-                .flatMap((entry) => [
-                  entry.phonetic,
-                  ...(entry.phonetics || []).map((item) => item.text),
-                ])
-                .filter(Boolean)
-                .slice(0, 3)
-                .map((phonetic) => (
-                  <Tag key={phonetic}>{phonetic}</Tag>
-                ))}
-              <Button
-                size="small"
-                icon={<SoundOutlined />}
-                onClick={handleAudio}
-              >
-                播放
-              </Button>
-            </Space>
+            {lookupWarning ? (
+              <Alert
+                type="warning"
+                showIcon
+                style={{ marginBottom: 14 }}
+                message={lookupWarning}
+              />
+            ) : null}
+            {entries.length > 0 ? (
+              <>
+                <Space align="center" wrap>
+                  <span className="dictionaryWord">{entries[0].word}</span>
+                  {entries
+                    .flatMap((entry) => [
+                      entry.phonetic,
+                      ...(entry.phonetics || []).map((item) => item.text),
+                    ])
+                    .filter(Boolean)
+                    .slice(0, 3)
+                    .map((phonetic) => (
+                      <Tag key={phonetic}>{phonetic}</Tag>
+                    ))}
+                  <Button
+                    size="small"
+                    icon={<SoundOutlined />}
+                    onClick={handleAudio}
+                  >
+                    播放
+                  </Button>
+                </Space>
 
-            <Divider />
+                <Divider />
+              </>
+            ) : null}
+            {zhTranslation ? (
+              <Alert
+                type="success"
+                showIcon
+                style={{ marginBottom: 14 }}
+                message={`中文释义：${zhTranslation}`}
+              />
+            ) : zhError ? (
+              <Alert
+                type="info"
+                showIcon
+                style={{ marginBottom: 14 }}
+                message={zhError}
+              />
+            ) : null}
 
             {entries
               .flatMap((entry) => entry.meanings || [])
@@ -635,9 +767,19 @@ export function AnnotationToolbar({
                       <div>
                         {index + 1}. {item.definition}
                       </div>
+                      {definitionTranslations[item.definition] ? (
+                        <div className="dictionaryRelated">
+                          释义：{definitionTranslations[item.definition]}
+                        </div>
+                      ) : null}
                       {item.example ? (
                         <div className="dictionaryExample">
                           例句：{item.example}
+                        </div>
+                      ) : null}
+                      {item.example && definitionTranslations[item.example] ? (
+                        <div className="dictionaryRelated">
+                          例句译文：{definitionTranslations[item.example]}
                         </div>
                       ) : null}
                       {item.synonyms && item.synonyms.length > 0 ? (
@@ -651,7 +793,7 @@ export function AnnotationToolbar({
               ))}
           </div>
         ) : (
-          <Alert type="info" showIcon message="选中英文单词后点击查词。" />
+          <Alert type="info" showIcon message="选中英文单词或句子后点击查词。" />
         )}
       </Drawer>
     </>

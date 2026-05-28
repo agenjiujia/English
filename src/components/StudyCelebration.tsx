@@ -80,7 +80,7 @@ export function useStudyCelebration() {
       timerRef.current = window.setTimeout(() => {
         setCelebration(null);
         timerRef.current = null;
-      }, 2600);
+      }, 2200);
     },
     [],
   );
@@ -103,7 +103,7 @@ export function StudyCelebration({
       <div className="studyCelebrationGlow" aria-hidden="true" />
       <div className="studyCelebrationRing" aria-hidden="true" />
       <div className="studyCelebrationConfetti" aria-hidden="true">
-        {Array.from({ length: 28 }).map((_, index) => (
+        {Array.from({ length: 20 }).map((_, index) => (
           <span
             key={index}
             style={
