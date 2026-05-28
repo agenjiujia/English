@@ -1,0 +1,21 @@
+import { defineConfig } from "@umijs/max";
+
+export default defineConfig({
+  npmClient: "npm",
+  routes: [
+    {
+      path: "/",
+      component: "@/pages/index",
+    },
+    {
+      path: "/remaining",
+      component: "@/pages/remaining",
+    },
+    {
+      path: "/phonics",
+      component: "@/pages/phonics",
+    },
+  ],
+  mfsu: false,
+  title: "英语系统知识库",
+});

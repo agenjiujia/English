@@ -1,0 +1,28 @@
+{
+  "name": "english-review",
+  "private": true,
+  "description": "史振龙英语学习 · 艾宾浩斯全自动复习",
+  "scripts": {
+    "_py": "command -v python3.14 || command -v python3.13 || command -v python3.12 || command -v python3.11 || command -v python3.10 || command -v python3",
+    "sync": "$(npm run -s _py) .cursor/skills/english-review/scripts/review.py sync",
+    "init": "$(npm run -s _py) .cursor/skills/english-review/scripts/review.py init",
+    "exam": "$(npm run -s _py) .cursor/skills/english-review/scripts/review.py generate",
+    "generate": "npm run exam",
+    "grade": "$(npm run -s _py) .cursor/skills/english-review/scripts/review.py grade",
+    "dev": "umi dev",
+    "build": "umi build",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@umijs/max": "^4.4.12",
+    "antd": "^5.27.6",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3"
+  }
+}

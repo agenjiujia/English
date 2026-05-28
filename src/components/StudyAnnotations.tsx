@@ -1,0 +1,659 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Alert,
+  Button,
+  Divider,
+  Drawer,
+  Popconfirm,
+  Space,
+  Spin,
+  Tag,
+} from "antd";
+import { SoundOutlined, SearchOutlined } from "@ant-design/icons";
+
+type AnnotationStyle = {
+  bold?: boolean;
+  background?: string;
+  color?: string;
+  fontSize?: string;
+  circle?: boolean;
+};
+
+type Annotation = AnnotationStyle & {
+  id: string;
+  targetId: string;
+  start: number;
+  end: number;
+};
+
+const paletteOptions = [
+  {
+    label: "黄底",
+    color: "#f7c948",
+    style: { background: "#fff0a8" },
+  },
+  {
+    label: "绿底",
+    color: "#3bb273",
+    style: { background: "#d9f7e8" },
+  },
+  {
+    label: "红字",
+    color: "#e5484d",
+    style: {
+      color: "#d92d20",
+      bold: true,
+      fontSize: "calc(1em + 2px)",
+    },
+  },
+  {
+    label: "蓝字",
+    color: "#2f80ed",
+    style: { color: "#1677ff", bold: true },
+  },
+] satisfies Array<{
+  label: string;
+  color: string;
+  style: AnnotationStyle;
+}>;
+
+type SelectionState = {
+  targetId: string;
+  start: number;
+  end: number;
+  top: number;
+  left: number;
+  text: string;
+};
+
+type DictionaryPhonetic = {
+  text?: string;
+  audio?: string;
+};
+
+type DictionaryDefinition = {
+  definition: string;
+  example?: string;
+  synonyms?: string[];
+  antonyms?: string[];
+};
+
+type DictionaryMeaning = {
+  partOfSpeech: string;
+  definitions: DictionaryDefinition[];
+};
+
+type DictionaryEntry = {
+  word: string;
+  phonetic?: string;
+  phonetics?: DictionaryPhonetic[];
+  meanings?: DictionaryMeaning[];
+};
+
+const DB_NAME = "english-study-storage";
+const DB_VERSION = 1;
+const TOOLBAR_ESTIMATED_HEIGHT = 104;
+const TOOLBAR_SELECTION_GAP = 14;
+
+type StoreName = "annotations" | "dictionary";
+
+function openStudyDB() {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    if (!("indexedDB" in window)) {
+      reject(new Error("当前浏览器不支持 IndexedDB"));
+      return;
+    }
+
+    const request = window.indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains("annotations")) {
+        db.createObjectStore("annotations");
+      }
+      if (!db.objectStoreNames.contains("dictionary")) {
+        db.createObjectStore("dictionary");
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function idbGet<T>(storeName: StoreName, key: string) {
+  const db = await openStudyDB();
+  return new Promise<T | undefined>((resolve, reject) => {
+    const transaction = db.transaction(storeName, "readonly");
+    const request = transaction.objectStore(storeName).get(key);
+    request.onsuccess = () => resolve(request.result as T | undefined);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+    transaction.onerror = () => db.close();
+  });
+}
+
+async function idbSet<T>(storeName: StoreName, key: string, value: T) {
+  const db = await openStudyDB();
+  return new Promise<void>((resolve, reject) => {
+    const transaction = db.transaction(storeName, "readwrite");
+    const request = transaction.objectStore(storeName).put(value, key);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+    transaction.onerror = () => db.close();
+  });
+}
+
+function getLookupWord(text: string) {
+  return (
+    text
+      .trim()
+      .match(/[A-Za-z][A-Za-z'-]*/)?.[0]
+      .toLowerCase() || ""
+  );
+}
+
+function speakText(text: string) {
+  if (!("speechSynthesis" in window)) return false;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  utterance.rate = 0.85;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+  return true;
+}
+
+function playDictionaryAudio(entries: DictionaryEntry[]) {
+  const audioUrl = entries
+    .flatMap((entry) => entry.phonetics || [])
+    .map((phonetic) => phonetic.audio)
+    .find(Boolean);
+
+  if (!audioUrl) return false;
+  const audio = new Audio(audioUrl);
+  void audio.play();
+  return true;
+}
+
+async function fetchDictionary(word: string) {
+  try {
+    const cached = await idbGet<DictionaryEntry[]>("dictionary", word);
+    if (cached) return cached;
+  } catch {
+    // Query network below if IndexedDB is temporarily unavailable.
+  }
+
+  const response = await fetch(
+    `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
+  );
+  if (!response.ok) {
+    throw new Error("未查到这个单词");
+  }
+
+  const data = (await response.json()) as DictionaryEntry[];
+  try {
+    await idbSet("dictionary", word, data);
+  } catch {
+    // Dictionary lookup still succeeds even if cache write fails.
+  }
+  return data;
+}
+
+function getTextOffset(container: HTMLElement, node: Node, offset: number) {
+  const range = document.createRange();
+  range.selectNodeContents(container);
+  range.setEnd(node, offset);
+  return range.toString().length;
+}
+
+function overlaps(a: Annotation, start: number, end: number) {
+  return a.start < end && start < a.end;
+}
+
+function getTargetElement(node: Node | null) {
+  const element =
+    node instanceof HTMLElement ? node : node?.parentElement || null;
+  return element?.closest<HTMLElement>("[data-markable-id]") || null;
+}
+
+export function useStudyAnnotations(pageKey: string) {
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+  const [selection, setSelection] = useState<SelectionState | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAnnotations = async () => {
+      try {
+        const indexed = await idbGet<Annotation[]>("annotations", pageKey);
+        if (cancelled) return;
+
+        if (indexed) {
+          setAnnotations(indexed);
+          setHydrated(true);
+          return;
+        }
+      } catch {
+        if (!cancelled) {
+          setAnnotations([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setHydrated(true);
+        }
+      }
+    };
+
+    void loadAnnotations();
+    return () => {
+      cancelled = true;
+    };
+  }, [pageKey]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    void idbSet("annotations", pageKey, annotations).catch(() => undefined);
+  }, [annotations, hydrated, pageKey]);
+
+  useEffect(() => {
+    const updateSelection = () => {
+      const selected = window.getSelection();
+      if (!selected || selected.isCollapsed || selected.rangeCount === 0) {
+        setSelection(null);
+        return;
+      }
+
+      const range = selected.getRangeAt(0);
+      const startElement = getTargetElement(range.startContainer);
+      const endElement = getTargetElement(range.endContainer);
+      if (!startElement || !endElement || startElement !== endElement) {
+        setSelection(null);
+        return;
+      }
+
+      const start = getTextOffset(
+        startElement,
+        range.startContainer,
+        range.startOffset,
+      );
+      const end = getTextOffset(
+        startElement,
+        range.endContainer,
+        range.endOffset,
+      );
+      const normalizedStart = Math.min(start, end);
+      const normalizedEnd = Math.max(start, end);
+      if (normalizedStart === normalizedEnd) {
+        setSelection(null);
+        return;
+      }
+
+      const rect = range.getBoundingClientRect();
+      const toolbarTop =
+        rect.top > TOOLBAR_ESTIMATED_HEIGHT + TOOLBAR_SELECTION_GAP
+          ? rect.top +
+            window.scrollY -
+            TOOLBAR_ESTIMATED_HEIGHT -
+            TOOLBAR_SELECTION_GAP
+          : rect.bottom + window.scrollY + TOOLBAR_SELECTION_GAP;
+
+      setSelection({
+        targetId: startElement.dataset.markableId || "",
+        start: normalizedStart,
+        end: normalizedEnd,
+        top: toolbarTop,
+        left: rect.left + window.scrollX + rect.width / 2,
+        text: range.toString().trim(),
+      });
+    };
+
+    document.addEventListener("mouseup", updateSelection);
+    document.addEventListener("keyup", updateSelection);
+    return () => {
+      document.removeEventListener("mouseup", updateSelection);
+      document.removeEventListener("keyup", updateSelection);
+    };
+  }, []);
+
+  const applyAnnotation = useCallback(
+    (style: AnnotationStyle) => {
+      if (!selection) return;
+      setAnnotations((current) => [
+        ...current,
+        {
+          ...style,
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          targetId: selection.targetId,
+          start: selection.start,
+          end: selection.end,
+        },
+      ]);
+      window.getSelection()?.removeAllRanges();
+      setSelection(null);
+    },
+    [selection],
+  );
+
+  const clearSelection = useCallback(() => {
+    if (!selection) return;
+    setAnnotations((current) =>
+      current.filter(
+        (item) =>
+          item.targetId !== selection.targetId ||
+          !overlaps(item, selection.start, selection.end),
+      ),
+    );
+    window.getSelection()?.removeAllRanges();
+    setSelection(null);
+  }, [selection]);
+
+  const clearAll = useCallback(() => {
+    setAnnotations([]);
+    setSelection(null);
+  }, []);
+
+  const getAnnotations = useCallback(
+    (targetId: string) =>
+      annotations.filter((item) => item.targetId === targetId),
+    [annotations],
+  );
+
+  return {
+    selection,
+    annotations,
+    applyAnnotation,
+    clearSelection,
+    clearAll,
+    getAnnotations,
+  };
+}
+
+export function MarkableText({
+  id,
+  text,
+  annotations,
+}: {
+  id: string;
+  text: string;
+  annotations: Annotation[];
+}) {
+  const segments = useMemo(() => {
+    const points = new Set([0, text.length]);
+    annotations.forEach((item) => {
+      points.add(Math.max(0, Math.min(text.length, item.start)));
+      points.add(Math.max(0, Math.min(text.length, item.end)));
+    });
+    const sorted = [...points].sort((a, b) => a - b);
+    return sorted.slice(0, -1).map((start, index) => {
+      const end = sorted[index + 1];
+      const active = annotations.filter(
+        (item) => item.start < end && start < item.end,
+      );
+      return { start, end, active, text: text.slice(start, end) };
+    });
+  }, [annotations, text]);
+
+  return (
+    <span className="markableText" data-markable-id={id}>
+      {segments.map((segment) => {
+        const style = segment.active.reduce<React.CSSProperties>(
+          (result, item) => ({
+            ...result,
+            backgroundColor: item.background || result.backgroundColor,
+            color: item.color || result.color,
+            fontSize: item.fontSize || result.fontSize,
+          }),
+          {},
+        );
+        const className = [
+          "annotationMark",
+          segment.active.some((item) => item.bold) ? "annotationBold" : "",
+          segment.active.some((item) => item.circle) ? "annotationCircle" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        return (
+          <span
+            key={`${segment.start}-${segment.end}`}
+            className={className}
+            style={style}
+          >
+            {segment.text}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+export function AnnotationToolbar({
+  selection,
+  applyAnnotation,
+  clearSelection,
+  clearAll,
+}: {
+  selection: SelectionState | null;
+  applyAnnotation: (style: AnnotationStyle) => void;
+  clearSelection: () => void;
+  clearAll: () => void;
+}) {
+  const [dictionaryOpen, setDictionaryOpen] = useState(false);
+  const [lookupWord, setLookupWord] = useState("");
+  const [entries, setEntries] = useState<DictionaryEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  if (!selection && !dictionaryOpen) return null;
+
+  const selectedText = selection?.text.trim() || "";
+  const word = getLookupWord(selectedText);
+
+  const handleSpeak = () => {
+    if (!selectedText) return;
+    speakText(selectedText);
+  };
+
+  const handleDictionary = async () => {
+    if (!word) {
+      setError("请选中一个英文单词后再查词。");
+      setEntries([]);
+      setLookupWord("");
+      setDictionaryOpen(true);
+      return;
+    }
+
+    setDictionaryOpen(true);
+    setLookupWord(word);
+    setLoading(true);
+    setError("");
+    try {
+      const result = await fetchDictionary(word);
+      setEntries(result);
+    } catch (err) {
+      setEntries([]);
+      setError(err instanceof Error ? err.message : "查词失败，请稍后再试。");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAudio = () => {
+    if (!playDictionaryAudio(entries) && lookupWord) {
+      speakText(lookupWord);
+    }
+  };
+
+  return (
+    <>
+      {selection ? (
+        <div
+          className="annotationToolbar"
+          style={{ top: selection.top, left: selection.left }}
+        >
+          <div className="annotationToolbarInner">
+            <div className="annotationMainPanel">
+              <div className="annotationPalette" aria-label="标记颜色">
+                {paletteOptions.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    className="annotationColorButton"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => applyAnnotation(item.style)}
+                    title={item.label}
+                  >
+                    <span
+                      className="annotationColorSwatch"
+                      style={
+                        { "--swatch-color": item.color } as React.CSSProperties
+                      }
+                    />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="annotationToolGroup">
+                <button
+                  type="button"
+                  className="annotationToolButton"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={handleSpeak}
+                >
+                  <SoundOutlined />
+                  <span>朗读</span>
+                </button>
+                <button
+                  type="button"
+                  className="annotationToolButton"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={handleDictionary}
+                >
+                  <SearchOutlined />
+                  <span>查词</span>
+                </button>
+                <button
+                  type="button"
+                  className="annotationToolButton strong"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => applyAnnotation({ bold: true })}
+                >
+                  <span>B</span>
+                  <span>加粗</span>
+                </button>
+                <button
+                  type="button"
+                  className="annotationToolButton"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => applyAnnotation({ circle: true })}
+                >
+                  <span className="circleIcon">○</span>
+                  <span>画圈</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="annotationDangerGroup">
+              <button
+                type="button"
+                className="annotationDangerButton"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={clearSelection}
+              >
+                清除所选
+              </button>
+              <Popconfirm
+                title="清空本页所有标记？"
+                okText="清空"
+                cancelText="取消"
+                onConfirm={clearAll}
+              >
+                <button
+                  type="button"
+                  className="annotationDangerButton"
+                  onMouseDown={(event) => event.preventDefault()}
+                >
+                  清空本页
+                </button>
+              </Popconfirm>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <Drawer
+        title={lookupWord ? `单词信息：${lookupWord}` : "单词信息"}
+        open={dictionaryOpen}
+        width={420}
+        onClose={() => setDictionaryOpen(false)}
+      >
+        {loading ? (
+          <div className="dictionaryLoading">
+            <Spin />
+          </div>
+        ) : error ? (
+          <Alert type="warning" showIcon message={error} />
+        ) : entries.length > 0 ? (
+          <div className="dictionaryPanel">
+            <Space align="center" wrap>
+              <span className="dictionaryWord">{entries[0].word}</span>
+              {entries
+                .flatMap((entry) => [
+                  entry.phonetic,
+                  ...(entry.phonetics || []).map((item) => item.text),
+                ])
+                .filter(Boolean)
+                .slice(0, 3)
+                .map((phonetic) => (
+                  <Tag key={phonetic}>{phonetic}</Tag>
+                ))}
+              <Button
+                size="small"
+                icon={<SoundOutlined />}
+                onClick={handleAudio}
+              >
+                播放
+              </Button>
+            </Space>
+
+            <Divider />
+
+            {entries
+              .flatMap((entry) => entry.meanings || [])
+              .map((meaning, meaningIndex) => (
+                <div
+                  key={`${meaning.partOfSpeech}-${meaningIndex}`}
+                  className="dictionaryMeaning"
+                >
+                  <Tag color="blue">{meaning.partOfSpeech}</Tag>
+                  {meaning.definitions.slice(0, 4).map((item, index) => (
+                    <div
+                      key={`${item.definition}-${index}`}
+                      className="dictionaryDefinition"
+                    >
+                      <div>
+                        {index + 1}. {item.definition}
+                      </div>
+                      {item.example ? (
+                        <div className="dictionaryExample">
+                          例句：{item.example}
+                        </div>
+                      ) : null}
+                      {item.synonyms && item.synonyms.length > 0 ? (
+                        <div className="dictionaryRelated">
+                          同义词：{item.synonyms.slice(0, 6).join(", ")}
+                        </div>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              ))}
+          </div>
+        ) : (
+          <Alert type="info" showIcon message="选中英文单词后点击查词。" />
+        )}
+      </Drawer>
+    </>
+  );
+}
