@@ -2,6 +2,9 @@ import { defineConfig } from "@umijs/max";
 
 export default defineConfig({
   npmClient: "npm",
+  base: "/English/",
+  publicPath: "/English/",
+  outputPath: "docs",
   routes: [
     {
       path: "/",
@@ -18,5 +21,5 @@ export default defineConfig({
   ],
   mfsu: false,
   title: "英语系统知识库",
-  favicons: ["/favicon.svg"],
+  favicons: ["favicon.svg"],
 });
