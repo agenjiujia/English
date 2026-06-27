@@ -25,6 +25,7 @@ import { useStudyProgress } from "@/components/StudyProgress";
 import {
   AnnotationToolbar,
   MarkableText,
+  StudyAnnotationsProvider,
   useStudyAnnotations,
 } from "@/components/StudyAnnotations";
 import { useStableAnchorScroll } from "@/hooks/useStableAnchorScroll";
@@ -454,7 +455,11 @@ export default function GrammarHome() {
   });
 
   return (
-    <ConfigProvider
+    <StudyAnnotationsProvider
+      updateNote={annotations.updateNote}
+      deleteNote={annotations.deleteNote}
+    >
+      <ConfigProvider
       theme={{
         token: {
           colorPrimary: "#2f8f83",
@@ -622,6 +627,7 @@ export default function GrammarHome() {
         <AnnotationToolbar
           selection={annotations.selection}
           applyAnnotation={annotations.applyAnnotation}
+            applyAnnotationAtSelection={annotations.applyAnnotationAtSelection}
           clearSelection={annotations.clearSelection}
           clearAll={annotations.clearAll}
         />
@@ -629,6 +635,7 @@ export default function GrammarHome() {
         <DoubaoChatWidget />
         <FloatButton.BackTop />
       </Layout>
-    </ConfigProvider>
+      </ConfigProvider>
+    </StudyAnnotationsProvider>
   );
 }

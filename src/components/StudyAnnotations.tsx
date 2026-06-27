@@ -4,12 +4,18 @@ import {
   Button,
   Divider,
   Drawer,
+  Input,
+  Popover,
   Popconfirm,
   Space,
   Spin,
   Tag,
 } from "antd";
-import { SoundOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  CommentOutlined,
+  SearchOutlined,
+  SoundOutlined,
+} from "@ant-design/icons";
 
 type AnnotationStyle = {
   bold?: boolean;
@@ -17,6 +23,7 @@ type AnnotationStyle = {
   color?: string;
   fontSize?: string;
   circle?: boolean;
+  note?: string;
 };
 
 type Annotation = AnnotationStyle & {
@@ -24,6 +31,10 @@ type Annotation = AnnotationStyle & {
   targetId: string;
   start: number;
   end: number;
+};
+
+type NoteAnnotation = Annotation & {
+  note: string;
 };
 
 const paletteOptions = [
@@ -227,16 +238,70 @@ function overlaps(a: Annotation, start: number, end: number) {
   return a.start < end && start < a.end;
 }
 
+function hasRenderableStyle(item: AnnotationStyle) {
+  return Boolean(
+    item.bold || item.background || item.color || item.fontSize || item.circle,
+  );
+}
+
 function getTargetElement(node: Node | null) {
   const element =
     node instanceof HTMLElement ? node : node?.parentElement || null;
   return element?.closest<HTMLElement>("[data-markable-id]") || null;
 }
 
+type AnnotationNoteActionsContextValue = {
+  updateNote: (annotationId: string, note: string) => void;
+  deleteNote: (annotationId: string) => void;
+};
+
+const AnnotationNoteActionsContext =
+  React.createContext<AnnotationNoteActionsContextValue | null>(null);
+
+export function StudyAnnotationsProvider({
+  children,
+  updateNote,
+  deleteNote,
+}: {
+  children: React.ReactNode;
+  updateNote: (annotationId: string, note: string) => void;
+  deleteNote: (annotationId: string) => void;
+}) {
+  const value = useMemo(
+    () => ({
+      updateNote,
+      deleteNote,
+    }),
+    [deleteNote, updateNote],
+  );
+
+  return (
+    <AnnotationNoteActionsContext.Provider value={value}>
+      {children}
+    </AnnotationNoteActionsContext.Provider>
+  );
+}
+
 export function useStudyAnnotations(pageKey: string) {
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [selection, setSelection] = useState<SelectionState | null>(null);
+
+  const commitAnnotation = useCallback(
+    (targetSelection: SelectionState, style: AnnotationStyle) => {
+      setAnnotations((current) => [
+        ...current,
+        {
+          ...style,
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          targetId: targetSelection.targetId,
+          start: targetSelection.start,
+          end: targetSelection.end,
+        },
+      ]);
+    },
+    [],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -336,20 +401,20 @@ export function useStudyAnnotations(pageKey: string) {
   const applyAnnotation = useCallback(
     (style: AnnotationStyle) => {
       if (!selection) return;
-      setAnnotations((current) => [
-        ...current,
-        {
-          ...style,
-          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-          targetId: selection.targetId,
-          start: selection.start,
-          end: selection.end,
-        },
-      ]);
+      commitAnnotation(selection, style);
       window.getSelection()?.removeAllRanges();
       setSelection(null);
     },
-    [selection],
+    [commitAnnotation, selection],
+  );
+
+  const applyAnnotationAtSelection = useCallback(
+    (targetSelection: SelectionState, style: AnnotationStyle) => {
+      commitAnnotation(targetSelection, style);
+      window.getSelection()?.removeAllRanges();
+      setSelection(null);
+    },
+    [commitAnnotation],
   );
 
   const clearSelection = useCallback(() => {
@@ -370,6 +435,43 @@ export function useStudyAnnotations(pageKey: string) {
     setSelection(null);
   }, []);
 
+  const updateNote = useCallback((annotationId: string, note: string) => {
+    const trimmed = note.trim();
+    setAnnotations((current) =>
+      current.flatMap((item) => {
+        if (item.id !== annotationId) {
+          return [item];
+        }
+
+        if (trimmed) {
+          return [{ ...item, note: trimmed }];
+        }
+
+        if (hasRenderableStyle(item)) {
+          return [{ ...item, note: undefined }];
+        }
+
+        return [];
+      }),
+    );
+  }, []);
+
+  const deleteNote = useCallback((annotationId: string) => {
+    setAnnotations((current) =>
+      current.flatMap((item) => {
+        if (item.id !== annotationId) {
+          return [item];
+        }
+
+        if (hasRenderableStyle(item)) {
+          return [{ ...item, note: undefined }];
+        }
+
+        return [];
+      }),
+    );
+  }, []);
+
   const getAnnotations = useCallback(
     (targetId: string) =>
       annotations.filter((item) => item.targetId === targetId),
@@ -380,10 +482,118 @@ export function useStudyAnnotations(pageKey: string) {
     selection,
     annotations,
     applyAnnotation,
+    applyAnnotationAtSelection,
     clearSelection,
     clearAll,
+    updateNote,
+    deleteNote,
     getAnnotations,
   };
+}
+
+function AnnotationNotePopover({
+  children,
+  notes,
+}: {
+  children: React.ReactNode;
+  notes: NoteAnnotation[];
+}) {
+  const noteActions = React.useContext(AnnotationNoteActionsContext);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+
+  const handleStartEdit = (note: NoteAnnotation) => {
+    setEditingId(note.id);
+    setDraft(note.note);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setDraft("");
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingId || !noteActions) return;
+    const trimmed = draft.trim();
+    if (!trimmed) return;
+    noteActions.updateNote(editingId, trimmed);
+    setEditingId(null);
+    setDraft("");
+  };
+
+  const handleDelete = (annotationId: string) => {
+    if (!noteActions) return;
+    noteActions.deleteNote(annotationId);
+    if (editingId === annotationId) {
+      setEditingId(null);
+      setDraft("");
+    }
+  };
+
+  return (
+    <Popover
+      trigger="hover"
+      placement="top"
+      overlayClassName="annotationNotePopover"
+      content={
+        <div className="annotationNoteCard">
+          {notes.map((note) => (
+            <div key={note.id} className="annotationNoteItem">
+              {editingId === note.id ? (
+                <>
+                  <Input.TextArea
+                    value={draft}
+                    autoSize={{ minRows: 2, maxRows: 4 }}
+                    maxLength={160}
+                    showCount
+                    onChange={(event) => setDraft(event.target.value)}
+                  />
+                  <div className="annotationNoteItemActions">
+                    <Button size="small" onClick={handleCancelEdit}>
+                      取消
+                    </Button>
+                    <Button
+                      size="small"
+                      type="primary"
+                      disabled={!draft.trim()}
+                      onClick={handleSaveEdit}
+                    >
+                      保存
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="annotationNoteText">{note.note}</div>
+                  {noteActions ? (
+                    <div className="annotationNoteItemActions">
+                      <Button
+                        size="small"
+                        type="text"
+                        onClick={() => handleStartEdit(note)}
+                      >
+                        编辑
+                      </Button>
+                      <Button
+                        size="small"
+                        type="text"
+                        danger
+                        onClick={() => handleDelete(note.id)}
+                      >
+                        删除
+                      </Button>
+                    </div>
+                  ) : null}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      }
+    >
+      <span className="annotationNoteInline">{children}</span>
+    </Popover>
+  );
 }
 
 export function MarkableText({
@@ -413,7 +623,27 @@ export function MarkableText({
 
   return (
     <span className="markableText" data-markable-id={id}>
-      {segments.map((segment) => {
+      {segments.map((segment, segmentIndex) => {
+        const noteAnnotations = segment.active
+          .filter(
+            (item): item is NoteAnnotation =>
+              typeof item.note === "string" && Boolean(item.note.trim()),
+          )
+          .map((item) => ({
+            ...item,
+            note: item.note.trim(),
+          }));
+        const previousNoteIds = new Set(
+          (segments[segmentIndex - 1]?.active || [])
+            .filter(
+              (item): item is NoteAnnotation =>
+                typeof item.note === "string" && Boolean(item.note.trim()),
+            )
+            .map((item) => item.id),
+        );
+        const showNoteIcon =
+          noteAnnotations.length > 0 &&
+          noteAnnotations.some((item) => !previousNoteIds.has(item.id));
         const style = segment.active.reduce<React.CSSProperties>(
           (result, item) => ({
             ...result,
@@ -427,18 +657,37 @@ export function MarkableText({
           "annotationMark",
           segment.active.some((item) => item.bold) ? "annotationBold" : "",
           segment.active.some((item) => item.circle) ? "annotationCircle" : "",
+          noteAnnotations.length > 0 ? "annotationNote" : "",
         ]
           .filter(Boolean)
           .join(" ");
 
-        return (
+        const content = (
           <span
             key={`${segment.start}-${segment.end}`}
             className={className}
             style={style}
           >
+            {showNoteIcon ? (
+              <span className="annotationNoteLeadIcon" aria-hidden="true">
+                注
+              </span>
+            ) : null}
             {segment.text}
           </span>
+        );
+
+        if (noteAnnotations.length === 0) {
+          return content;
+        }
+
+        return (
+          <AnnotationNotePopover
+            key={`${segment.start}-${segment.end}`}
+            notes={noteAnnotations}
+          >
+            {content}
+          </AnnotationNotePopover>
         );
       })}
     </span>
@@ -448,14 +697,24 @@ export function MarkableText({
 export function AnnotationToolbar({
   selection,
   applyAnnotation,
+  applyAnnotationAtSelection,
   clearSelection,
   clearAll,
 }: {
   selection: SelectionState | null;
   applyAnnotation: (style: AnnotationStyle) => void;
+  applyAnnotationAtSelection: (
+    targetSelection: SelectionState,
+    style: AnnotationStyle,
+  ) => void;
   clearSelection: () => void;
   clearAll: () => void;
 }) {
+  const [noteEditorOpen, setNoteEditorOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [noteSelection, setNoteSelection] = useState<SelectionState | null>(
+    null,
+  );
   const [dictionaryOpen, setDictionaryOpen] = useState(false);
   const [lookupWord, setLookupWord] = useState("");
   const [lookupText, setLookupText] = useState("");
@@ -469,12 +728,19 @@ export function AnnotationToolbar({
     Record<string, string>
   >({});
   const lookupRequestRef = React.useRef(0);
-
-  if (!selection && !dictionaryOpen) return null;
-
-  const selectedText = selection?.text.trim() || "";
+  const toolbarSelection = selection || noteSelection;
+  const selectedText = toolbarSelection?.text.trim() || "";
   const word = getLookupWord(selectedText);
   const isSingleWordSelection = /^[A-Za-z][A-Za-z'-]*$/.test(selectedText);
+
+  React.useEffect(() => {
+    if (!selection && !noteEditorOpen) {
+      setNoteDraft("");
+      setNoteSelection(null);
+    }
+  }, [noteEditorOpen, selection]);
+
+  if (!toolbarSelection && !dictionaryOpen && !noteEditorOpen) return null;
 
   const handleSpeak = () => {
     if (!selectedText) return;
@@ -502,7 +768,8 @@ export function AnnotationToolbar({
     setZhError("");
     setDefinitionTranslations({});
     try {
-      const translationResultPromise = fetchFreeChineseTranslation(selectedText);
+      const translationResultPromise =
+        fetchFreeChineseTranslation(selectedText);
       const dictionaryResultPromise =
         isSingleWordSelection && word
           ? fetchDictionary(word)
@@ -539,7 +806,10 @@ export function AnnotationToolbar({
         throw new Error("查词与翻译都失败了，请稍后再试。");
       }
 
-      if (dictionaryResult.status === "fulfilled" && dictionaryResult.value.length) {
+      if (
+        dictionaryResult.status === "fulfilled" &&
+        dictionaryResult.value.length
+      ) {
         const texts = dictionaryResult.value
           .flatMap((entry) => entry.meanings || [])
           .flatMap((meaning) => meaning.definitions.slice(0, 4))
@@ -583,12 +853,35 @@ export function AnnotationToolbar({
     }
   };
 
+  const handleOpenNoteEditor = () => {
+    if (!selection) return;
+    setNoteSelection(selection);
+    setNoteDraft("");
+    setNoteEditorOpen(true);
+  };
+
+  const handleSaveNote = () => {
+    const trimmed = noteDraft.trim();
+    const targetSelection = noteSelection || selection;
+    if (!trimmed || !targetSelection) return;
+    applyAnnotationAtSelection(targetSelection, { note: trimmed });
+    setNoteDraft("");
+    setNoteEditorOpen(false);
+    setNoteSelection(null);
+  };
+
+  const handleCancelNote = () => {
+    setNoteDraft("");
+    setNoteEditorOpen(false);
+    setNoteSelection(null);
+  };
+
   return (
     <>
-      {selection ? (
+      {toolbarSelection ? (
         <div
           className="annotationToolbar"
-          style={{ top: selection.top, left: selection.left }}
+          style={{ top: toolbarSelection.top, left: toolbarSelection.left }}
         >
           <div className="annotationToolbarInner">
             <div className="annotationMainPanel">
@@ -650,6 +943,15 @@ export function AnnotationToolbar({
                   <span className="circleIcon">○</span>
                   <span>画圈</span>
                 </button>
+                <button
+                  type="button"
+                  className="annotationToolButton"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={handleOpenNoteEditor}
+                >
+                  <CommentOutlined />
+                  <span>备注</span>
+                </button>
               </div>
             </div>
 
@@ -678,6 +980,39 @@ export function AnnotationToolbar({
               </Popconfirm>
             </div>
           </div>
+
+          {noteEditorOpen ? (
+            <div className="annotationNoteEditor">
+              <div className="annotationNoteEditorHeader">添加备注</div>
+              <Input.TextArea
+                value={noteDraft}
+                rows={3}
+                maxLength={160}
+                showCount
+                placeholder="输入这段内容的学习备注，hover 时会显示。"
+                onChange={(event) => setNoteDraft(event.target.value)}
+              />
+              <div className="annotationNoteEditorActions">
+                <button
+                  type="button"
+                  className="annotationToolButton"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={handleCancelNote}
+                >
+                  取消
+                </button>
+                <button
+                  type="button"
+                  className="annotationToolButton strong"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={handleSaveNote}
+                  disabled={!noteDraft.trim()}
+                >
+                  保存备注
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -793,7 +1128,11 @@ export function AnnotationToolbar({
               ))}
           </div>
         ) : (
-          <Alert type="info" showIcon message="选中英文单词或句子后点击查词。" />
+          <Alert
+            type="info"
+            showIcon
+            message="选中英文单词或句子后点击查词。"
+          />
         )}
       </Drawer>
     </>
