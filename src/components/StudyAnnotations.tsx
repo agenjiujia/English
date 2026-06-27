@@ -574,14 +574,18 @@ function AnnotationNotePopover({
                       >
                         编辑
                       </Button>
-                      <Button
-                        size="small"
-                        type="text"
-                        danger
-                        onClick={() => handleDelete(note.id)}
+                      <Popconfirm
+                        title="删除这条备注？"
+                        description="删除后将无法恢复。"
+                        okText="删除"
+                        cancelText="取消"
+                        okButtonProps={{ danger: true }}
+                        onConfirm={() => handleDelete(note.id)}
                       >
-                        删除
-                      </Button>
+                        <Button size="small" type="text" danger>
+                          删除
+                        </Button>
+                      </Popconfirm>
                     </div>
                   ) : null}
                 </>
