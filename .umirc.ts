@@ -1,10 +1,13 @@
 import { defineConfig } from "@umijs/max";
 
+const isElectron = process.env.UMI_ENV === "electron";
+
 export default defineConfig({
   npmClient: "npm",
-  base: "/English/",
-  publicPath: "/English/",
-  outputPath: "docs",
+  base: isElectron ? "./" : "/English/",
+  publicPath: isElectron ? "./" : "/English/",
+  outputPath: isElectron ? "dist" : "docs",
+  history: { type: "hash" },
   routes: [
     {
       path: "/",
