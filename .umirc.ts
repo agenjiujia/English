@@ -4,7 +4,7 @@ const isElectron = process.env.UMI_ENV === "electron";
 
 export default defineConfig({
   npmClient: "npm",
-  base: isElectron ? "./" : "/English/",
+  base: "/",
   publicPath: isElectron ? "./" : "/English/",
   outputPath: isElectron ? "dist" : "docs",
   history: { type: "hash" },

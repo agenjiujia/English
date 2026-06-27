@@ -266,13 +266,8 @@ function TopicCard({
 }
 
 export default function RemainingKnowledgePage() {
-  const toPath = React.useCallback((path: string) => {
-    const pathname = window.location.pathname;
-    const prefix =
-      pathname === "/English" || pathname.startsWith("/English/")
-        ? "/English"
-        : "";
-    return `${prefix}${path}`;
+  const goToRoute = React.useCallback((path: string) => {
+    window.location.hash = path;
   }, []);
   const annotations = useStudyAnnotations("remaining");
   const progress = useStudyProgress("remaining");
@@ -505,7 +500,7 @@ export default function RemainingKnowledgePage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = toPath("/");
+              goToRoute("/");
             }}
           >
             返回语法知识库
@@ -513,7 +508,7 @@ export default function RemainingKnowledgePage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = toPath("/phonics");
+              goToRoute("/phonics");
             }}
           >
             查看自然拼读系统知识库

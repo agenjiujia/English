@@ -591,13 +591,8 @@ function PhonicsCombinedStageCard({
 }
 
 export default function PhonicsPage() {
-  const toPath = React.useCallback((path: string) => {
-    const pathname = window.location.pathname;
-    const prefix =
-      pathname === "/English" || pathname.startsWith("/English/")
-        ? "/English"
-        : "";
-    return `${prefix}${path}`;
+  const goToRoute = React.useCallback((path: string) => {
+    window.location.hash = path;
   }, []);
   const annotations = useStudyAnnotations("phonics");
   const progress = useStudyProgress("phonics");
@@ -852,7 +847,7 @@ export default function PhonicsPage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = toPath("/");
+              goToRoute("/");
             }}
           >
             返回语法知识库
@@ -860,7 +855,7 @@ export default function PhonicsPage() {
           <Button
             className="sideActionButton"
             onClick={() => {
-              window.location.href = toPath("/remaining");
+              goToRoute("/remaining");
             }}
           >
             查看剩余英语能力知识点
