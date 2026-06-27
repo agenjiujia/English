@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
+import { StudyCountTag } from "@/components/StudyCountTag";
 import {
   StudyCelebration,
   useStudyCelebration,
@@ -460,13 +461,21 @@ function PhonicsSectionCard({
   number,
   getAnnotations,
   mastered,
+  studyCount,
   onToggleMastered,
+  onIncrementStudyCount,
+  onDecrementStudyCount,
+  onSetStudyCount,
 }: {
   section: PhonicsSection;
   number: string;
   getAnnotations: GetAnnotations;
   mastered: boolean;
+  studyCount: number;
   onToggleMastered: () => void;
+  onIncrementStudyCount: () => void;
+  onDecrementStudyCount: () => void;
+  onSetStudyCount: (count: number) => void;
 }) {
   return (
     <section id={section.id} className="topicSection">
@@ -485,13 +494,21 @@ function PhonicsSectionCard({
             </Space>
           }
           extra={
-            <Button
-              size="small"
-              type={mastered ? "primary" : "default"}
-              onClick={onToggleMastered}
-            >
-              {mastered ? "已掌握" : "掌握"}
-            </Button>
+            <Space size={8} wrap>
+              <StudyCountTag
+                count={studyCount}
+                onIncrement={onIncrementStudyCount}
+                onDecrement={onDecrementStudyCount}
+                onChange={onSetStudyCount}
+              />
+              <Button
+                size="small"
+                type={mastered ? "primary" : "default"}
+                onClick={onToggleMastered}
+              >
+                {mastered ? "已掌握" : "掌握"}
+              </Button>
+            </Space>
           }
         >
           <Paragraph className="summary">
@@ -517,13 +534,21 @@ function PhonicsCombinedStageCard({
   number,
   getAnnotations,
   mastered,
+  studyCount,
   onToggleMastered,
+  onIncrementStudyCount,
+  onDecrementStudyCount,
+  onSetStudyCount,
 }: {
   stage: PhonicsStage;
   number: string;
   getAnnotations: GetAnnotations;
   mastered: boolean;
+  studyCount: number;
   onToggleMastered: () => void;
+  onIncrementStudyCount: () => void;
+  onDecrementStudyCount: () => void;
+  onSetStudyCount: (count: number) => void;
 }) {
   const firstSection = stage.sections[0];
 
@@ -546,13 +571,21 @@ function PhonicsCombinedStageCard({
             </Space>
           }
           extra={
-            <Button
-              size="small"
-              type={mastered ? "primary" : "default"}
-              onClick={onToggleMastered}
-            >
-              {mastered ? "已掌握" : "掌握"}
-            </Button>
+            <Space size={8} wrap>
+              <StudyCountTag
+                count={studyCount}
+                onIncrement={onIncrementStudyCount}
+                onDecrement={onDecrementStudyCount}
+                onChange={onSetStudyCount}
+              />
+              <Button
+                size="small"
+                type={mastered ? "primary" : "default"}
+                onClick={onToggleMastered}
+              >
+                {mastered ? "已掌握" : "掌握"}
+              </Button>
+            </Space>
           }
         >
           <Paragraph className="summary">
@@ -808,7 +841,17 @@ export default function PhonicsPage() {
                   mastered={stage.sections.every((section) =>
                     progress.isMastered(section.id),
                   )}
+                  studyCount={progress.getStudyCount(stage.id)}
                   onToggleMastered={() => handleToggleStageMastered(stage)}
+                  onIncrementStudyCount={() =>
+                    progress.incrementStudyCount(stage.id)
+                  }
+                  onDecrementStudyCount={() =>
+                    progress.decrementStudyCount(stage.id)
+                  }
+                  onSetStudyCount={(count) =>
+                    progress.setStudyCount(stage.id, count)
+                  }
                 />
               ) : (
                 stage.sections.map((section, sectionIndex) => (
@@ -818,8 +861,18 @@ export default function PhonicsPage() {
                     number={`${stageIndex + 1}.${sectionIndex + 1}`}
                     getAnnotations={annotations.getAnnotations}
                     mastered={progress.isMastered(section.id)}
+                    studyCount={progress.getStudyCount(section.id)}
                     onToggleMastered={() =>
                       handleToggleSectionMastered(section)
+                    }
+                    onIncrementStudyCount={() =>
+                      progress.incrementStudyCount(section.id)
+                    }
+                    onDecrementStudyCount={() =>
+                      progress.decrementStudyCount(section.id)
+                    }
+                    onSetStudyCount={(count) =>
+                      progress.setStudyCount(section.id, count)
                     }
                   />
                 ))

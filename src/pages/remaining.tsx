@@ -16,6 +16,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
+import { StudyCountTag } from "@/components/StudyCountTag";
 import {
   StudyCelebration,
   useStudyCelebration,
@@ -190,13 +191,21 @@ function TopicCard({
   number,
   getAnnotations,
   mastered,
+  studyCount,
   onToggleMastered,
+  onIncrementStudyCount,
+  onDecrementStudyCount,
+  onSetStudyCount,
 }: {
   topic: GrammarTopic;
   number: string;
   getAnnotations: GetAnnotations;
   mastered: boolean;
+  studyCount: number;
   onToggleMastered: () => void;
+  onIncrementStudyCount: () => void;
+  onDecrementStudyCount: () => void;
+  onSetStudyCount: (count: number) => void;
 }) {
   return (
     <section id={topic.id} className="topicSection">
@@ -214,13 +223,21 @@ function TopicCard({
             </Space>
           }
           extra={
-            <Button
-              size="small"
-              type={mastered ? "primary" : "default"}
-              onClick={onToggleMastered}
-            >
-              {mastered ? "已掌握" : "掌握"}
-            </Button>
+            <Space size={8} wrap>
+              <StudyCountTag
+                count={studyCount}
+                onIncrement={onIncrementStudyCount}
+                onDecrement={onDecrementStudyCount}
+                onChange={onSetStudyCount}
+              />
+              <Button
+                size="small"
+                type={mastered ? "primary" : "default"}
+                onClick={onToggleMastered}
+              >
+                {mastered ? "已掌握" : "掌握"}
+              </Button>
+            </Space>
           }
         >
           <Paragraph className="summary">
@@ -474,7 +491,17 @@ export default function RemainingKnowledgePage() {
                   number={`${stageIndex + 1}.${topicIndex + 1}`}
                   getAnnotations={annotations.getAnnotations}
                   mastered={progress.isMastered(topic.id)}
+                  studyCount={progress.getStudyCount(topic.id)}
                   onToggleMastered={() => handleToggleTopicMastered(topic)}
+                  onIncrementStudyCount={() =>
+                    progress.incrementStudyCount(topic.id)
+                  }
+                  onDecrementStudyCount={() =>
+                    progress.decrementStudyCount(topic.id)
+                  }
+                  onSetStudyCount={(count) =>
+                    progress.setStudyCount(topic.id, count)
+                  }
                 />
               ))}
             </section>
