@@ -1054,7 +1054,24 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 6px;
-  margin-top: 8px;
+}
+
+.annotationNoteEditorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.annotationNoteCount {
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: rgba(23, 32, 51, 0.42);
+}
+
+.annotationNoteTextarea :global(.ant-input-data-count) {
+  display: none;
 }
 
 .annotationToolbar {

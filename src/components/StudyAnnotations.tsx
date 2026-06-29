@@ -547,24 +547,29 @@ function AnnotationNotePopover({
               {editingId === note.id ? (
                 <>
                   <Input.TextArea
+                    className="annotationNoteTextarea"
                     value={draft}
                     autoSize={{ minRows: 2, maxRows: 4 }}
                     maxLength={NOTE_MAX_LENGTH}
-                    showCount
                     onChange={(event) => setDraft(event.target.value)}
                   />
-                  <div className="annotationNoteItemActions">
-                    <Button size="small" onClick={handleCancelEdit}>
-                      取消
-                    </Button>
-                    <Button
-                      size="small"
-                      type="primary"
-                      disabled={!draft.trim()}
-                      onClick={handleSaveEdit}
-                    >
-                      保存
-                    </Button>
+                  <div className="annotationNoteEditorFooter">
+                    <span className="annotationNoteCount">
+                      {draft.length} / {NOTE_MAX_LENGTH}
+                    </span>
+                    <div className="annotationNoteItemActions">
+                      <Button size="small" onClick={handleCancelEdit}>
+                        取消
+                      </Button>
+                      <Button
+                        size="small"
+                        type="primary"
+                        disabled={!draft.trim()}
+                        onClick={handleSaveEdit}
+                      >
+                        保存
+                      </Button>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -994,31 +999,36 @@ export function AnnotationToolbar({
             <div className="annotationNoteEditor">
               <div className="annotationNoteEditorHeader">添加备注</div>
               <Input.TextArea
+                className="annotationNoteTextarea"
                 value={noteDraft}
                 rows={3}
                 maxLength={NOTE_MAX_LENGTH}
-                showCount
                 placeholder="输入这段内容的学习备注，hover 时会显示。"
                 onChange={(event) => setNoteDraft(event.target.value)}
               />
-              <div className="annotationNoteEditorActions">
-                <button
-                  type="button"
-                  className="annotationToolButton"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={handleCancelNote}
-                >
-                  取消
-                </button>
-                <button
-                  type="button"
-                  className="annotationToolButton strong"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={handleSaveNote}
-                  disabled={!noteDraft.trim()}
-                >
-                  保存备注
-                </button>
+              <div className="annotationNoteEditorFooter">
+                <span className="annotationNoteCount">
+                  {noteDraft.length} / {NOTE_MAX_LENGTH}
+                </span>
+                <div className="annotationNoteEditorActions">
+                  <button
+                    type="button"
+                    className="annotationToolButton"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={handleCancelNote}
+                  >
+                    取消
+                  </button>
+                  <button
+                    type="button"
+                    className="annotationToolButton strong"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={handleSaveNote}
+                    disabled={!noteDraft.trim()}
+                  >
+                    保存备注
+                  </button>
+                </div>
               </div>
             </div>
           ) : null}
