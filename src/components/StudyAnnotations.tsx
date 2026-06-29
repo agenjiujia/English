@@ -105,6 +105,7 @@ const DB_NAME = "english-study-storage";
 const DB_VERSION = 1;
 const TOOLBAR_ESTIMATED_HEIGHT = 104;
 const TOOLBAR_SELECTION_GAP = 14;
+const NOTE_MAX_LENGTH = 280;
 
 type StoreName = "annotations" | "dictionary";
 
@@ -128,6 +129,10 @@ function openStudyDB() {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+}
+
+function normalizeNoteText(note: string) {
+  return note.trim().slice(0, NOTE_MAX_LENGTH);
 }
 
 async function idbGet<T>(storeName: StoreName, key: string) {
@@ -436,7 +441,7 @@ export function useStudyAnnotations(pageKey: string) {
   }, []);
 
   const updateNote = useCallback((annotationId: string, note: string) => {
-    const trimmed = note.trim();
+    const trimmed = normalizeNoteText(note);
     setAnnotations((current) =>
       current.flatMap((item) => {
         if (item.id !== annotationId) {
@@ -514,7 +519,7 @@ function AnnotationNotePopover({
 
   const handleSaveEdit = () => {
     if (!editingId || !noteActions) return;
-    const trimmed = draft.trim();
+    const trimmed = normalizeNoteText(draft);
     if (!trimmed) return;
     noteActions.updateNote(editingId, trimmed);
     setEditingId(null);
@@ -544,7 +549,7 @@ function AnnotationNotePopover({
                   <Input.TextArea
                     value={draft}
                     autoSize={{ minRows: 2, maxRows: 4 }}
-                    maxLength={160}
+                    maxLength={NOTE_MAX_LENGTH}
                     showCount
                     onChange={(event) => setDraft(event.target.value)}
                   />
@@ -865,7 +870,7 @@ export function AnnotationToolbar({
   };
 
   const handleSaveNote = () => {
-    const trimmed = noteDraft.trim();
+    const trimmed = normalizeNoteText(noteDraft);
     const targetSelection = noteSelection || selection;
     if (!trimmed || !targetSelection) return;
     applyAnnotationAtSelection(targetSelection, { note: trimmed });
@@ -991,7 +996,7 @@ export function AnnotationToolbar({
               <Input.TextArea
                 value={noteDraft}
                 rows={3}
-                maxLength={160}
+                maxLength={NOTE_MAX_LENGTH}
                 showCount
                 placeholder="输入这段内容的学习备注，hover 时会显示。"
                 onChange={(event) => setNoteDraft(event.target.value)}
