@@ -694,12 +694,12 @@ body {
   height: 30px;
   padding-inline: 11px;
   margin-inline-end: 0;
-  border-color: rgba(47, 143, 131, 0.16);
+  border-color: var(--study-count-border, rgba(47, 143, 131, 0.16));
   border-radius: 999px;
-  background: rgba(240, 248, 245, 0.92);
+  background: var(--study-count-bg, rgba(240, 248, 245, 0.92));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    0 4px 10px rgba(23, 32, 51, 0.04);
+    0 4px 10px var(--study-count-shadow, rgba(23, 32, 51, 0.04));
   cursor: pointer;
   user-select: none;
   transition:
@@ -714,32 +714,32 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #3fa492;
-  box-shadow: 0 0 0 3px rgba(63, 164, 146, 0.12);
+  background: var(--study-count-dot, #3fa492);
+  box-shadow: 0 0 0 3px var(--study-count-dot-ring, rgba(63, 164, 146, 0.12));
   transition:
     background 0.16s ease,
     box-shadow 0.16s ease;
 }
 
 .studyCountTagLabel {
-  color: rgba(23, 32, 51, 0.54);
+  color: var(--study-count-label, rgba(23, 32, 51, 0.54));
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
 
 .studyCountTagValue {
-  color: #246d63;
+  color: var(--study-count-text, #246d63);
   font-size: 12px;
   font-weight: 800;
 }
 
 .studyCountTag:hover {
-  border-color: rgba(47, 143, 131, 0.24);
-  background: rgba(234, 246, 242, 0.96);
+  border-color: var(--study-count-border, rgba(47, 143, 131, 0.24));
+  background: var(--study-count-bg-hover, rgba(234, 246, 242, 0.96));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 6px 14px rgba(47, 143, 131, 0.08);
+    0 6px 14px var(--study-count-glow, rgba(47, 143, 131, 0.08));
   transform: translateY(-1px);
 }
 
@@ -748,27 +748,27 @@ body {
 }
 
 .studyCountTagActive {
-  color: #246d63;
-  border-color: rgba(47, 143, 131, 0.32);
-  background: rgba(225, 242, 236, 0.98);
+  color: var(--study-count-text, #246d63);
+  border-color: var(--study-count-border, rgba(47, 143, 131, 0.32));
+  background: var(--study-count-bg-hover, rgba(225, 242, 236, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 8px 18px rgba(47, 143, 131, 0.1);
+    0 8px 18px var(--study-count-glow, rgba(47, 143, 131, 0.1));
 }
 
 .studyCountTagActive .studyCountTagDot {
-  background: #2f8f83;
-  box-shadow: 0 0 0 3px rgba(47, 143, 131, 0.16);
+  background: var(--study-count-dot, #2f8f83);
+  box-shadow: 0 0 0 3px var(--study-count-dot-ring, rgba(47, 143, 131, 0.16));
 }
 
 .studyCountTagActive .studyCountTagLabel,
 .studyCountTagActive .studyCountTagValue {
-  color: #246d63;
+  color: var(--study-count-text, #246d63);
 }
 
 .studyCountTagActive:hover {
-  color: #246d63;
-  background: rgba(218, 238, 231, 0.98);
+  color: var(--study-count-text, #246d63);
+  background: var(--study-count-bg-hover, rgba(218, 238, 231, 0.98));
 }
 
 .studyCountPopover :global(.ant-popover-inner) {
@@ -846,15 +846,15 @@ body {
   min-width: 62px;
   padding: 8px 10px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(47, 143, 131, 0.12);
+  background: var(--study-count-metric-bg, rgba(255, 255, 255, 0.76));
+  border: 1px solid var(--study-count-metric-border, rgba(47, 143, 131, 0.12));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 6px 14px rgba(47, 143, 131, 0.06);
+    0 6px 14px var(--study-count-glow, rgba(47, 143, 131, 0.06));
 }
 
 .studyCountPopoverMetricValue {
-  color: #226960;
+  color: var(--study-count-text, #226960);
   font-size: 22px;
   font-weight: 800;
   line-height: 1;
@@ -862,7 +862,7 @@ body {
 
 .studyCountPopoverMetricLabel {
   margin-top: 2px;
-  color: rgba(23, 32, 51, 0.56);
+  color: var(--study-count-label, rgba(23, 32, 51, 0.56));
   font-size: 11px;
   font-weight: 700;
 }
