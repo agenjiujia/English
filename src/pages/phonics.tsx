@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
+import { HotTopicsPanel } from "@/components/HotTopicsPanel";
 import { StudyCountTag } from "@/components/StudyCountTag";
 import {
   StudyCelebration,
@@ -27,6 +28,7 @@ import {
   StudyAnnotationsProvider,
   useStudyAnnotations,
 } from "@/components/StudyAnnotations";
+import { scrollToElementById } from "@/components/hotTopicsUtils";
 import { useStableAnchorScroll } from "@/hooks/useStableAnchorScroll";
 import { encouragementQuotes } from "@/data/encouragementQuotes";
 import { phonicsDocs, type PhonicsDoc } from "@/data/phonicsDocs";
@@ -662,6 +664,52 @@ export default function PhonicsPage() {
   const masteredCount = trackablePhonicsSections.filter((section) =>
     progress.isMastered(section.id),
   ).length;
+  const hotTopicItems = React.useMemo(
+    () =>
+      phonicsStages.flatMap((stage, stageIndex) => {
+        if (stageIndex === 0) {
+          const combinedNoteCount = annotations.annotations.filter((item) => {
+            if (!item.note?.trim()) return false;
+            if (item.targetId.startsWith(`${stage.id}-`)) return true;
+            return stage.sections.some((section) =>
+              item.targetId.startsWith(`${section.id}-combined`),
+            );
+          }).length;
+
+          return [
+            {
+              id: stage.id,
+              title: stage.title.replace(/^第.+?阶段：/, ""),
+              category: "阶段总览",
+              studyCount: progress.getStudyCount(stage.id),
+              noteCount: combinedNoteCount,
+              mastered: stage.sections.every((section) =>
+                progress.isMastered(section.id),
+              ),
+              order: stageIndex,
+              onOpen: () => scrollToElementById(`${stage.id}-content`),
+            },
+          ];
+        }
+
+        return stage.sections.map((section, sectionIndex) => ({
+          id: section.id,
+          title: cleanTocText(section.title),
+          category: section.tag,
+          studyCount: progress.getStudyCount(section.id),
+          noteCount: annotations.annotations.filter(
+            (item) =>
+              Boolean(item.note?.trim()) &&
+              (item.targetId === section.id ||
+                item.targetId.startsWith(`${section.id}-`)),
+          ).length,
+          mastered: progress.isMastered(section.id),
+          order: stageIndex * 100 + sectionIndex,
+          onOpen: () => scrollToElementById(section.id),
+        }));
+      }),
+    [annotations.annotations, phonicsStages, progress, progress.masteredIds, progress.studyCounts],
+  );
   const masteryPercent =
     trackablePhonicsSections.length > 0
       ? Math.round((masteredCount / trackablePhonicsSections.length) * 100)
@@ -928,6 +976,7 @@ export default function PhonicsPage() {
           clearAll={annotations.clearAll}
         />
         <StudyCelebration celebration={celebration.celebration} />
+        <HotTopicsPanel pageKey="phonics" items={hotTopicItems} />
         <DoubaoChatWidget />
         <FloatButton.BackTop />
       </Layout>

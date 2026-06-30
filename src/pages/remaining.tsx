@@ -16,6 +16,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
+import { HotTopicsPanel } from "@/components/HotTopicsPanel";
 import { StudyCountTag } from "@/components/StudyCountTag";
 import {
   StudyCelebration,
@@ -29,6 +30,10 @@ import {
   StudyAnnotationsProvider,
   useStudyAnnotations,
 } from "@/components/StudyAnnotations";
+import {
+  buildAnnotationNoteCountMap,
+  scrollToElementById,
+} from "@/components/hotTopicsUtils";
 import { useStableAnchorScroll } from "@/hooks/useStableAnchorScroll";
 import { encouragementQuotes } from "@/data/encouragementQuotes";
 import type { GrammarTopic } from "@/data/grammarTopics";
@@ -332,6 +337,28 @@ export default function RemainingKnowledgePage() {
     () => stagedTopics.flatMap((stage) => stage.topics),
     [stagedTopics],
   );
+  const noteCountByTopicId = React.useMemo(
+    () =>
+      buildAnnotationNoteCountMap(
+        orderedTopics.map((topic) => topic.id),
+        annotations.annotations,
+      ),
+    [annotations.annotations, orderedTopics],
+  );
+  const hotTopicItems = React.useMemo(
+    () =>
+      orderedTopics.map((topic, index) => ({
+        id: topic.id,
+        title: topic.title,
+        category: topic.category,
+        studyCount: progress.getStudyCount(topic.id),
+        noteCount: noteCountByTopicId[topic.id] || 0,
+        mastered: progress.isMastered(topic.id),
+        order: index,
+        onOpen: () => scrollToElementById(topic.id),
+      })),
+    [noteCountByTopicId, orderedTopics, progress, progress.masteredIds, progress.studyCounts],
+  );
   const masteredCount = orderedTopics.filter((topic) =>
     progress.isMastered(topic.id),
   ).length;
@@ -555,6 +582,7 @@ export default function RemainingKnowledgePage() {
           clearAll={annotations.clearAll}
         />
         <StudyCelebration celebration={celebration.celebration} />
+        <HotTopicsPanel pageKey="remaining" items={hotTopicItems} />
         <DoubaoChatWidget />
         <FloatButton.BackTop />
       </Layout>

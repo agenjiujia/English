@@ -16,6 +16,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
+import { HotTopicsPanel } from "@/components/HotTopicsPanel";
 import { StudyCountTag } from "@/components/StudyCountTag";
 import {
   StudyCelebration,
@@ -29,6 +30,10 @@ import {
   StudyAnnotationsProvider,
   useStudyAnnotations,
 } from "@/components/StudyAnnotations";
+import {
+  buildAnnotationNoteCountMap,
+  scrollToElementById,
+} from "@/components/hotTopicsUtils";
 import { useStableAnchorScroll } from "@/hooks/useStableAnchorScroll";
 import { encouragementQuotes } from "@/data/encouragementQuotes";
 import { basicWordTopics } from "@/data/basicWordTopics";
@@ -425,6 +430,28 @@ export default function GrammarHome() {
   const topicIndexById = new Map(
     allTopics.map((topic, index) => [topic.id, index]),
   );
+  const noteCountByTopicId = React.useMemo(
+    () =>
+      buildAnnotationNoteCountMap(
+        allTopics.map((topic) => topic.id),
+        annotations.annotations,
+      ),
+    [allTopics, annotations.annotations],
+  );
+  const hotTopicItems = React.useMemo(
+    () =>
+      allTopics.map((topic, index) => ({
+        id: topic.id,
+        title: topic.title,
+        category: topic.category,
+        studyCount: progress.getStudyCount(topic.id),
+        noteCount: noteCountByTopicId[topic.id] || 0,
+        mastered: progress.isMastered(topic.id),
+        order: index,
+        onOpen: () => scrollToElementById(topic.id),
+      })),
+    [allTopics, noteCountByTopicId, progress, progress.masteredIds, progress.studyCounts],
+  );
   const masteredCount = allTopics.filter((topic) =>
     progress.isMastered(topic.id),
   ).length;
@@ -659,6 +686,7 @@ export default function GrammarHome() {
             clearAll={annotations.clearAll}
           />
           <StudyCelebration celebration={celebration.celebration} />
+          <HotTopicsPanel pageKey="grammar" items={hotTopicItems} />
           <DoubaoChatWidget />
           <FloatButton.BackTop />
         </Layout>

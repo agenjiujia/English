@@ -1293,6 +1293,648 @@ body {
   transform: translateY(0);
 }
 
+.hotTopicsWidget {
+  position: fixed;
+  right: 24px;
+  bottom: 146px;
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.hotTopicsTrigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 148px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(47, 143, 131, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.92);
+  box-shadow:
+    0 10px 24px rgba(23, 32, 51, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #1f3d38;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.hotTopicsTrigger:hover {
+  transform: translateY(-1px);
+  background: rgba(252, 250, 244, 0.98);
+  box-shadow:
+    0 14px 28px rgba(23, 32, 51, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.hotTopicsTriggerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(255, 157, 72, 0.14);
+  color: #d97706;
+}
+
+.hotTopicsTriggerLabel {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.hotTopicsTriggerCount {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(47, 143, 131, 0.12);
+  color: #226960;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 26px;
+  text-align: center;
+}
+
+.hotTopicsCard {
+  width: min(620px, calc(100vw - 48px));
+  display: flex;
+  flex-direction: column;
+  height: 560px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(125, 207, 190, 0.16),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at top left,
+      rgba(255, 190, 92, 0.12),
+      transparent 28%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 252, 246, 0.98),
+      rgba(241, 247, 244, 0.96)
+    );
+  box-shadow:
+    0 26px 64px rgba(23, 32, 51, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+.hotTopicsCardNotes {
+  width: min(680px, calc(100vw - 48px));
+}
+
+.hotTopicsHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid rgba(23, 32, 51, 0.06);
+}
+
+.hotTopicsTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #172033;
+  font-size: 16px;
+}
+
+.hotTopicsSubtitle {
+  display: block;
+  max-width: 168px;
+  margin-top: 6px;
+  color: rgba(23, 32, 51, 0.46);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.hotTopicsHeaderActions {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.hotTopicsHeaderSecondaryActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hotTopicsTabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.05);
+}
+
+.hotTopicsTab {
+  appearance: none;
+  min-width: 48px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(23, 32, 51, 0.58);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hotTopicsTabActive {
+  box-shadow: 0 4px 10px rgba(47, 143, 131, 0.08);
+  background: rgba(226, 243, 238, 0.96);
+  color: #226960;
+}
+
+.hotTopicsHeaderButton {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.76);
+  color: rgba(23, 32, 51, 0.68);
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.hotTopicsHeaderButtonWide {
+  width: auto;
+  padding: 0 12px;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hotTopicsHeaderButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(47, 143, 131, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.hotTopicsHeaderButton.active {
+  color: #226960;
+  border-color: rgba(47, 143, 131, 0.2);
+  background: rgba(226, 243, 238, 0.88);
+}
+
+.hotTopicsBody {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.hotTopicsBodyNotes {
+  grid-template-columns: 230px minmax(0, 1fr);
+}
+
+.hotTopicsSide {
+  min-width: 0;
+  min-height: 0;
+}
+
+.hotTopicsListSide {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 14px 0 0;
+  border-right: 1px solid rgba(23, 32, 51, 0.05);
+  background: linear-gradient(
+    180deg,
+    rgba(250, 252, 248, 0.48),
+    rgba(244, 248, 245, 0.28)
+  );
+}
+
+.hotTopicsSectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 16px 12px;
+}
+
+.hotTopicsSectionHeadDetail {
+  padding: 0;
+}
+
+.hotTopicsSectionTitle {
+  color: rgba(23, 32, 51, 0.74);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.hotTopicsSectionMeta {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(47, 143, 131, 0.08);
+  color: #226960;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hotTopicsList {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  max-height: min(360px, 56vh);
+  padding: 0 12px 14px 16px;
+  overflow: auto;
+}
+
+.hotTopicsBodyNotes .hotTopicsList {
+  max-height: min(260px, 32vh);
+}
+
+.hotTopicsListItem {
+  appearance: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(47, 143, 131, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.hotTopicsListItem:hover,
+.hotTopicsListItemActive {
+  transform: translateY(-1px);
+  border-color: rgba(47, 143, 131, 0.18);
+  background: linear-gradient(
+    180deg,
+    rgba(239, 248, 244, 0.96),
+    rgba(232, 244, 239, 0.88)
+  );
+  box-shadow: 0 10px 18px rgba(47, 143, 131, 0.08);
+}
+
+.hotTopicsRank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 157, 72, 0.12);
+  color: #b45309;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.hotTopicsListMain {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.hotTopicsListTitle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.55;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.hotTopicsPinMark {
+  flex-shrink: 0;
+  color: #226960;
+}
+
+.hotTopicsListMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: rgba(23, 32, 51, 0.5);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.hotTopicsListMeta :global(.ant-tag) {
+  margin-inline-end: 0;
+  border-radius: 999px;
+  background: rgba(255, 244, 222, 0.88);
+  border-color: rgba(217, 154, 43, 0.12);
+  color: #9a6700;
+}
+
+.hotTopicsMetaPill {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.05);
+  color: rgba(23, 32, 51, 0.54);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hotTopicsListPreview {
+  color: rgba(23, 32, 51, 0.48);
+  font-size: 11px;
+  line-height: 1.6;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.hotTopicsListSubline {
+  color: rgba(23, 32, 51, 0.42);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.hotTopicsDetail {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 14px 18px 18px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.hotTopicsBodyNotes .hotTopicsDetail {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.hotTopicsDetailHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hotTopicsDetailTitle {
+  color: #172033;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.hotTopicsDetailMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.hotTopicsDetailMetaBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.05);
+  color: rgba(23, 32, 51, 0.58);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.hotTopicsStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  color: rgba(23, 32, 51, 0.56);
+  font-size: 12px;
+}
+
+.hotTopicsStats :global(.ant-tag) {
+  margin-inline-end: 0;
+}
+
+.hotTopicsStatPill {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.05);
+  color: rgba(23, 32, 51, 0.62);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hotTopicsStatPillMastered {
+  background: rgba(226, 243, 238, 0.9);
+  color: #226960;
+}
+
+.hotTopicsOpenButton {
+  height: 34px;
+  min-width: 64px;
+  border-radius: 12px;
+}
+
+.hotTopicsSavedNote,
+.hotTopicsHint {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.hotTopicsSavedNote {
+  color: #27574f;
+  background: rgba(223, 243, 237, 0.88);
+  border: 1px solid rgba(47, 143, 131, 0.1);
+}
+
+.hotTopicsHint {
+  color: rgba(23, 32, 51, 0.56);
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px dashed rgba(23, 32, 51, 0.1);
+}
+
+.hotTopicsEmptyState {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+  color: rgba(23, 32, 51, 0.56);
+  font-size: 12px;
+  text-align: center;
+}
+
+.hotTopicsNoteEditor {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.05);
+}
+
+.hotTopicsComposer {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.05);
+}
+
+.hotTopicsField {
+  display: grid;
+  gap: 8px;
+}
+
+.hotTopicsFieldLabel {
+  color: rgba(23, 32, 51, 0.62);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.hotTopicsComposerFooter {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hotTopicsComposerCount {
+  color: rgba(23, 32, 51, 0.42);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.hotTopicsComposerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.hotTopicsNoteModeActions {
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.hotTopicsNoteEditorFooter {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.hotTopicsNoteEditorFooter .hotTopicsComposerCount {
+  text-align: left;
+}
+
+.hotTopicsNotePreviewCard {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.05);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.hotTopicsNotePreviewHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hotTopicsNotePreviewTitle {
+  color: #172033;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.hotTopicsPreviewEditButton {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(47, 143, 131, 0.16);
+  border-radius: 12px;
+  background: rgba(226, 243, 238, 0.86);
+  color: #226960;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hotTopicsNotePreviewContent {
+  min-height: 0;
+  max-height: min(340px, 38vh);
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(252, 252, 249, 0.92);
+  box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.06);
+  color: rgba(23, 32, 51, 0.78);
+  font-size: 14px;
+  line-height: 1.85;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.hotTopicsNotePreviewEmpty {
+  align-items: center;
+}
+
 .studyCelebration {
   position: fixed;
   z-index: 1200;
@@ -1797,6 +2439,62 @@ body {
 
   .hero {
     padding: 24px;
+  }
+
+  .hotTopicsWidget {
+    right: 16px;
+    bottom: 144px;
+    left: 16px;
+    align-items: stretch;
+  }
+
+  .hotTopicsTrigger {
+    width: 100%;
+  }
+
+  .hotTopicsCard {
+    width: 100%;
+    height: min(560px, calc(100vh - 168px));
+  }
+
+  .hotTopicsBody {
+    grid-template-columns: 1fr;
+  }
+
+  .hotTopicsListSide {
+    border-right: 0;
+    border-bottom: 1px solid rgba(23, 32, 51, 0.05);
+  }
+
+  .hotTopicsHeader {
+    flex-direction: column;
+  }
+
+  .hotTopicsHeaderActions {
+    justify-items: stretch;
+    width: 100%;
+  }
+
+  .hotTopicsHeaderSecondaryActions {
+    justify-content: space-between;
+  }
+
+  .hotTopicsList {
+    max-height: 180px;
+    padding-bottom: 16px;
+  }
+
+  .hotTopicsDetail {
+    padding-top: 16px;
+  }
+
+  .hotTopicsDetailHead {
+    flex-direction: column;
+  }
+
+  .hotTopicsComposerFooter {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .annotationToolbar {
