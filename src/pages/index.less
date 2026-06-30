@@ -1367,10 +1367,10 @@ body {
 }
 
 .hotTopicsCard {
-  width: min(620px, calc(100vw - 48px));
+  width: min(680px, calc(100vw - 48px));
   display: flex;
   flex-direction: column;
-  height: 560px;
+  height: 760px;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 24px;
   background:
@@ -1396,40 +1396,56 @@ body {
   overflow: hidden;
 }
 
-.hotTopicsCardNotes {
-  width: min(680px, calc(100vw - 48px));
-}
-
 .hotTopicsHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 18px 18px 14px;
+  gap: 16px;
+  padding: 16px 18px 12px;
   border-bottom: 1px solid rgba(23, 32, 51, 0.06);
+}
+
+.hotTopicsHeaderMain {
+  min-width: 0;
+  flex: 1;
 }
 
 .hotTopicsTitleRow {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #172033;
   font-size: 16px;
+  min-width: 0;
+}
+
+.hotTopicsTitleText {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .hotTopicsSubtitle {
-  display: block;
-  max-width: 168px;
-  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 260px;
   color: rgba(23, 32, 51, 0.46);
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hotTopicsHeaderActions {
-  display: grid;
-  justify-items: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .hotTopicsHeaderSecondaryActions {
@@ -1513,10 +1529,6 @@ body {
   overflow: hidden;
 }
 
-.hotTopicsBodyNotes {
-  grid-template-columns: 230px minmax(0, 1fr);
-}
-
 .hotTopicsSide {
   min-width: 0;
   min-height: 0;
@@ -1546,6 +1558,14 @@ body {
   padding: 0;
 }
 
+.hotTopicsDetailInlineBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
 .hotTopicsSectionTitle {
   color: rgba(23, 32, 51, 0.74);
   font-size: 12px;
@@ -1569,13 +1589,15 @@ body {
   display: grid;
   align-content: start;
   gap: 10px;
-  max-height: min(360px, 56vh);
+  min-height: 0;
+  height: 100%;
   padding: 0 12px 14px 16px;
   overflow: auto;
 }
 
 .hotTopicsBodyNotes .hotTopicsList {
-  max-height: min(260px, 32vh);
+  min-height: 0;
+  height: 100%;
 }
 
 .hotTopicsListItem {
@@ -1596,9 +1618,13 @@ body {
     border-color 0.16s ease;
 }
 
-.hotTopicsListItem:hover,
-.hotTopicsListItemActive {
+.hotTopicsListItem:hover {
   transform: translateY(-1px);
+  border-color: rgba(47, 143, 131, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.hotTopicsListItemActive {
   border-color: rgba(47, 143, 131, 0.18);
   background: linear-gradient(
     180deg,
@@ -1625,7 +1651,7 @@ body {
 
 .hotTopicsListMain {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -1691,6 +1717,9 @@ body {
   color: rgba(23, 32, 51, 0.42);
   font-size: 11px;
   line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hotTopicsDetail {
@@ -1704,6 +1733,10 @@ body {
 
 .hotTopicsBodyNotes .hotTopicsDetail {
   grid-template-rows: auto minmax(0, 1fr);
+}
+
+.hotTopicsBody:not(.hotTopicsBodyNotes) .hotTopicsDetail {
+  grid-template-rows: auto auto auto minmax(0, 1fr);
 }
 
 .hotTopicsDetailHead {
@@ -1816,33 +1849,57 @@ body {
 
 .hotTopicsNoteEditor {
   display: grid;
-  gap: 12px;
-  padding: 16px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+  padding: 18px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.74);
   box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.05);
+  overflow: hidden;
 }
 
-.hotTopicsNoteEditorHead {
+.hotTopicsNoteEditorBody {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 14px;
-  padding-bottom: 2px;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+  min-height: 0;
 }
 
 .hotTopicsComposer {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 12px;
+  min-height: 0;
+  height: 100%;
   padding: 16px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.78);
   box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.05);
 }
 
+.hotTopicsComposer :global(.ant-input) {
+  height: 100% !important;
+  min-height: 0 !important;
+  resize: none;
+}
+
+.hotTopicsComposerTextarea {
+  height: 100%;
+  min-height: 0;
+}
+
 .hotTopicsField {
   display: grid;
   gap: 8px;
+  min-height: 0;
+}
+
+.hotTopicsFieldBody {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .hotTopicsFieldLabel {
@@ -1873,17 +1930,19 @@ body {
 }
 
 .hotTopicsNoteModeActions {
-  display: grid;
-  grid-auto-flow: column;
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: end;
-  align-content: start;
-  gap: 10px;
+  gap: 8px;
 }
 
 .hotTopicsNoteEditorFooter {
-  align-items: stretch;
-  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  margin-bottom: 2px;
+  border-top: 1px solid rgba(23, 32, 51, 0.06);
 }
 
 .hotTopicsNoteEditorFooter .hotTopicsComposerCount {
@@ -1892,13 +1951,23 @@ body {
 
 .hotTopicsNotePreviewCard {
   display: grid;
-  gap: 14px;
+  grid-template-rows: minmax(0, 1fr);
+  align-content: start;
+  gap: 0;
+  height: 100%;
   padding: 18px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.78);
   box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.05);
   min-height: 0;
   overflow: hidden;
+}
+
+.hotTopicsNotePreviewBody {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+  min-height: 0;
 }
 
 .hotTopicsBodyNotes .hotTopicsNoteEditor {
@@ -1916,14 +1985,17 @@ body {
 }
 
 .hotTopicsBodyNotes .hotTopicsNoteEditor :global(textarea.ant-input) {
-  min-height: 240px !important;
+  height: 100% !important;
+  min-height: 0 !important;
   border-radius: 18px;
+  resize: none;
+  overflow: auto !important;
 }
 
 .hotTopicsNotePreviewHead {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
 }
 
@@ -1934,26 +2006,10 @@ body {
   line-height: 1.5;
 }
 
-.hotTopicsPreviewEditButton {
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 12px;
-  border: 1px solid rgba(47, 143, 131, 0.16);
-  border-radius: 12px;
-  background: rgba(226, 243, 238, 0.86);
-  color: #226960;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
 .hotTopicsNotePreviewContent {
+  height: 100%;
   min-height: 0;
-  max-height: min(340px, 38vh);
-  padding: 14px 16px;
+  padding: 16px 18px;
   border-radius: 16px;
   background: rgba(252, 252, 249, 0.92);
   box-shadow: inset 0 0 0 1px rgba(23, 32, 51, 0.06);
@@ -1965,8 +2021,48 @@ body {
   word-break: break-word;
 }
 
+@media (max-width: 720px) {
+  .hotTopicsHeader {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .hotTopicsTitleRow {
+    flex-wrap: wrap;
+  }
+
+  .hotTopicsSubtitle {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .hotTopicsHeaderActions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .hotTopicsDetailHead {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hotTopicsSectionHeadDetail,
+  .hotTopicsDetailInlineBar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .hotTopicsNoteModeActions {
+    flex-wrap: wrap;
+    justify-content: start;
+  }
+}
+
 .hotTopicsNotePreviewEmpty {
+  height: 100%;
   align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .studyCelebration {
@@ -2488,7 +2584,7 @@ body {
 
   .hotTopicsCard {
     width: 100%;
-    height: min(560px, calc(100vh - 168px));
+    height: min(760px, calc(100vh - 168px));
   }
 
   .hotTopicsBody {
