@@ -727,130 +727,159 @@ export function HotTopicsPanel({
                   ) : null}
                 </div>
                 {selectedPersonalNote ? (
-                  <>
-                    <div className="hotTopicsDetailHead">
-                      <div>
-                        <div className="hotTopicsDetailTitle">
-                          {personalNoteMode === "edit"
-                            ? "笔记编辑"
-                            : "笔记预览"}
-                        </div>
-                        <div className="hotTopicsDetailMetaRow">
-                          <span className="hotTopicsDetailMetaBadge">
-                            最近更新 {selectedPersonalNoteUpdatedAt}
-                          </span>
-                          <span className="hotTopicsDetailMetaBadge">
-                            正文 {selectedPersonalNote.content.length} 字
-                          </span>
-                        </div>
-                      </div>
-                      <div className="hotTopicsComposerActions hotTopicsNoteModeActions">
-                        <div
-                          className="hotTopicsTabs"
-                          role="tablist"
-                          aria-label="笔记模式切换"
-                        >
-                          <button
-                            type="button"
-                            className={
-                              personalNoteMode === "preview"
-                                ? "hotTopicsTab hotTopicsTabActive"
-                                : "hotTopicsTab"
-                            }
-                            onClick={() => setPersonalNoteMode("preview")}
-                          >
-                            预览
-                          </button>
-                          <button
-                            type="button"
-                            className={
-                              personalNoteMode === "edit"
-                                ? "hotTopicsTab hotTopicsTabActive"
-                                : "hotTopicsTab"
-                            }
-                            onClick={() => setPersonalNoteMode("edit")}
-                          >
-                            编辑
-                          </button>
-                        </div>
-                        <Button
-                          size="small"
-                          icon={<Trash2 size={14} />}
-                          onClick={() =>
-                            handleDeletePersonalNote(selectedPersonalNote.id)
-                          }
-                        >
-                          删除
-                        </Button>
-                      </div>
-                    </div>
-
-                    {personalNoteMode === "edit" ? (
-                      <div className="hotTopicsNoteEditor">
-                        <div className="hotTopicsField">
-                          <div className="hotTopicsFieldLabel">标题</div>
-                          <Input
-                            value={personalTitleDraft}
-                            maxLength={PERSONAL_NOTE_TITLE_MAX_LENGTH}
-                            placeholder="笔记标题"
-                            onKeyDown={handleNativeSelectAll}
-                            onChange={(event) =>
-                              setPersonalTitleDraft(event.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="hotTopicsField">
-                          <div className="hotTopicsFieldLabel">正文</div>
-                          <Input.TextArea
-                            value={personalContentDraft}
-                            maxLength={PERSONAL_NOTE_CONTENT_MAX_LENGTH}
-                            autoSize={{ minRows: 9, maxRows: 14 }}
-                            placeholder="记录你的易错点、口诀、复盘计划。"
-                            onKeyDown={handleNativeSelectAll}
-                            onChange={(event) =>
-                              setPersonalContentDraft(event.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="hotTopicsComposerFooter hotTopicsNoteEditorFooter">
-                          <span className="hotTopicsComposerCount">
-                            标题 {personalTitleDraft.length} /{" "}
-                            {PERSONAL_NOTE_TITLE_MAX_LENGTH}，正文{" "}
-                            {personalContentDraft.length} /{" "}
-                            {PERSONAL_NOTE_CONTENT_MAX_LENGTH}
-                          </span>
-                          <div className="hotTopicsComposerActions">
-                            <Button
-                              size="small"
-                              onClick={() => {
-                                setPersonalTitleDraft(
-                                  selectedPersonalNote.title,
-                                );
-                                setPersonalContentDraft(
-                                  selectedPersonalNote.content,
-                                );
-                              }}
-                            >
-                              还原
-                            </Button>
-                            <Button
-                              size="small"
-                              type="primary"
-                              icon={<PenLine size={14} />}
-                              disabled={
-                                personalTitleDraft.trim() ===
-                                  selectedPersonalNote.title &&
-                                personalContentDraft.trim() ===
-                                  selectedPersonalNote.content
-                              }
-                              onClick={handleSavePersonalNote}
-                            >
-                              保存笔记
-                            </Button>
+                  personalNoteMode === "edit" ? (
+                    <div className="hotTopicsNoteEditor">
+                      <div className="hotTopicsNoteEditorHead">
+                        <div className="hotTopicsDetailHeadMain">
+                          <div className="hotTopicsDetailTitle">笔记编辑</div>
+                          <div className="hotTopicsDetailMetaRow">
+                            <span className="hotTopicsDetailMetaBadge">
+                              最近更新 {selectedPersonalNoteUpdatedAt}
+                            </span>
+                            <span className="hotTopicsDetailMetaBadge">
+                              正文 {selectedPersonalNote.content.length} 字
+                            </span>
                           </div>
                         </div>
+                        <div className="hotTopicsComposerActions hotTopicsNoteModeActions">
+                          <div
+                            className="hotTopicsTabs"
+                            role="tablist"
+                            aria-label="笔记模式切换"
+                          >
+                            <button
+                              type="button"
+                              className="hotTopicsTab"
+                              onClick={() => setPersonalNoteMode("preview")}
+                            >
+                              预览
+                            </button>
+                            <button
+                              type="button"
+                              className="hotTopicsTab hotTopicsTabActive"
+                              onClick={() => setPersonalNoteMode("edit")}
+                            >
+                              编辑
+                            </button>
+                          </div>
+                          <Button
+                            size="small"
+                            icon={<Trash2 size={14} />}
+                            onClick={() =>
+                              handleDeletePersonalNote(selectedPersonalNote.id)
+                            }
+                          >
+                            删除
+                          </Button>
+                        </div>
                       </div>
-                    ) : (
+                      <div className="hotTopicsField">
+                        <div className="hotTopicsFieldLabel">标题</div>
+                        <Input
+                          value={personalTitleDraft}
+                          maxLength={PERSONAL_NOTE_TITLE_MAX_LENGTH}
+                          placeholder="笔记标题"
+                          onKeyDown={handleNativeSelectAll}
+                          onChange={(event) =>
+                            setPersonalTitleDraft(event.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="hotTopicsField">
+                        <div className="hotTopicsFieldLabel">正文</div>
+                        <Input.TextArea
+                          value={personalContentDraft}
+                          maxLength={PERSONAL_NOTE_CONTENT_MAX_LENGTH}
+                          autoSize={{ minRows: 9, maxRows: 14 }}
+                          placeholder="记录你的易错点、口诀、复盘计划。"
+                          onKeyDown={handleNativeSelectAll}
+                          onChange={(event) =>
+                            setPersonalContentDraft(event.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="hotTopicsComposerFooter hotTopicsNoteEditorFooter">
+                        <span className="hotTopicsComposerCount">
+                          标题 {personalTitleDraft.length} /{" "}
+                          {PERSONAL_NOTE_TITLE_MAX_LENGTH}，正文{" "}
+                          {personalContentDraft.length} /{" "}
+                          {PERSONAL_NOTE_CONTENT_MAX_LENGTH}
+                        </span>
+                        <div className="hotTopicsComposerActions">
+                          <Button
+                            size="small"
+                            onClick={() => {
+                              setPersonalTitleDraft(selectedPersonalNote.title);
+                              setPersonalContentDraft(
+                                selectedPersonalNote.content,
+                              );
+                            }}
+                          >
+                            还原
+                          </Button>
+                          <Button
+                            size="small"
+                            type="primary"
+                            icon={<PenLine size={14} />}
+                            disabled={
+                              personalTitleDraft.trim() ===
+                                selectedPersonalNote.title &&
+                              personalContentDraft.trim() ===
+                                selectedPersonalNote.content
+                            }
+                            onClick={handleSavePersonalNote}
+                          >
+                            保存笔记
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="hotTopicsDetailHead">
+                        <div className="hotTopicsDetailHeadMain">
+                          <div className="hotTopicsDetailTitle">笔记预览</div>
+                          <div className="hotTopicsDetailMetaRow">
+                            <span className="hotTopicsDetailMetaBadge">
+                              最近更新 {selectedPersonalNoteUpdatedAt}
+                            </span>
+                            <span className="hotTopicsDetailMetaBadge">
+                              正文 {selectedPersonalNote.content.length} 字
+                            </span>
+                          </div>
+                        </div>
+                        <div className="hotTopicsComposerActions hotTopicsNoteModeActions">
+                          <div
+                            className="hotTopicsTabs"
+                            role="tablist"
+                            aria-label="笔记模式切换"
+                          >
+                            <button
+                              type="button"
+                              className="hotTopicsTab hotTopicsTabActive"
+                              onClick={() => setPersonalNoteMode("preview")}
+                            >
+                              预览
+                            </button>
+                            <button
+                              type="button"
+                              className="hotTopicsTab"
+                              onClick={() => setPersonalNoteMode("edit")}
+                            >
+                              编辑
+                            </button>
+                          </div>
+                          <Button
+                            size="small"
+                            icon={<Trash2 size={14} />}
+                            onClick={() =>
+                              handleDeletePersonalNote(selectedPersonalNote.id)
+                            }
+                          >
+                            删除
+                          </Button>
+                        </div>
+                      </div>
                       <div className="hotTopicsNotePreviewCard">
                         <div className="hotTopicsNotePreviewHead">
                           <div className="hotTopicsNotePreviewTitle">
@@ -878,8 +907,8 @@ export function HotTopicsPanel({
                           </div>
                         )}
                       </div>
-                    )}
-                  </>
+                    </>
+                  )
                 ) : (
                   <div className="hotTopicsHint">
                     先新建一条笔记，再开始整理你的重点内容。
