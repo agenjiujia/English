@@ -1297,7 +1297,7 @@ body {
   position: fixed;
   right: 24px;
   bottom: 146px;
-  z-index: 950;
+  z-index: 960;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -1309,7 +1309,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-width: 148px;
+  min-width: 172px;
   height: 44px;
   padding: 0 14px;
   border: 1px solid rgba(47, 143, 131, 0.18);
@@ -1394,6 +1394,10 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(18px);
   overflow: hidden;
+}
+
+.hotTopicsCardNotes {
+  width: min(780px, calc(100vw - 48px));
 }
 
 .hotTopicsHeader {
@@ -1527,6 +1531,10 @@ body {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.hotTopicsBodyNotes {
+  grid-template-columns: 310px minmax(0, 1fr);
 }
 
 .hotTopicsSide {
@@ -2576,7 +2584,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-width: 148px;
+  min-width: 172px;
   height: 44px;
   padding: 0 14px;
   border: 1px solid rgba(47, 143, 131, 0.18);
