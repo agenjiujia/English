@@ -4,6 +4,7 @@ import {
   BookText,
   Eye,
   Flame,
+  GripVertical,
   PenLine,
   Pin,
   PinOff,
@@ -193,6 +194,12 @@ export function HotTopicsPanel({
   const [personalTitleDraft, setPersonalTitleDraft] = React.useState("");
   const [personalContentDraft, setPersonalContentDraft] = React.useState("");
   const [state, setState] = React.useState<HotTopicsState>(EMPTY_STATE);
+  const [draggingNoteId, setDraggingNoteId] = React.useState<string | null>(
+    null,
+  );
+  const [dragOverNoteId, setDragOverNoteId] = React.useState<string | null>(
+    null,
+  );
   const rootRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
@@ -394,6 +401,23 @@ export function HotTopicsPanel({
       personalNotes: current.personalNotes.filter((item) => item.id !== noteId),
     }));
   }, []);
+
+  const handleReorderPersonalNote = React.useCallback(
+    (sourceId: string, targetId: string) => {
+      if (sourceId === targetId) return;
+      setState((current) => {
+        const notes = current.personalNotes;
+        const fromIndex = notes.findIndex((item) => item.id === sourceId);
+        const toIndex = notes.findIndex((item) => item.id === targetId);
+        if (fromIndex === -1 || toIndex === -1) return current;
+        const next = [...notes];
+        const [moved] = next.splice(fromIndex, 1);
+        next.splice(toIndex, 0, moved);
+        return { ...current, personalNotes: next };
+      });
+    },
+    [],
+  );
 
   const activeCount = rankedItems.filter(
     (item) => item.studyCount > 0 || item.noteCount || item.manualNote,
@@ -676,20 +700,57 @@ export function HotTopicsPanel({
                   {personalNotes.length ? (
                     personalNotes.map((note, index) => {
                       const active = note.id === selectedPersonalNote?.id;
+                      const dragging = note.id === draggingNoteId;
+                      const dragOver =
+                        note.id === dragOverNoteId &&
+                        draggingNoteId !== null &&
+                        draggingNoteId !== note.id;
+                      const classNames = ["hotTopicsListItem"];
+                      if (active) classNames.push("hotTopicsListItemActive");
+                      if (dragging) classNames.push("hotTopicsListItemDragging");
+                      if (dragOver) classNames.push("hotTopicsListItemDragOver");
                       return (
                         <button
                           key={note.id}
                           type="button"
-                          className={
-                            active
-                              ? "hotTopicsListItem hotTopicsListItemActive"
-                              : "hotTopicsListItem"
-                          }
+                          draggable
+                          className={classNames.join(" ")}
                           onClick={() => {
                             setSelectedPersonalNoteId(note.id);
                             setPersonalNoteMode("preview");
                           }}
+                          onDragStart={(event) => {
+                            setDraggingNoteId(note.id);
+                            event.dataTransfer.effectAllowed = "move";
+                            event.dataTransfer.setData("text/plain", note.id);
+                          }}
+                          onDragOver={(event) => {
+                            if (!draggingNoteId) return;
+                            event.preventDefault();
+                            event.dataTransfer.dropEffect = "move";
+                            if (dragOverNoteId !== note.id) {
+                              setDragOverNoteId(note.id);
+                            }
+                          }}
+                          onDrop={(event) => {
+                            event.preventDefault();
+                            if (draggingNoteId) {
+                              handleReorderPersonalNote(draggingNoteId, note.id);
+                            }
+                            setDraggingNoteId(null);
+                            setDragOverNoteId(null);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingNoteId(null);
+                            setDragOverNoteId(null);
+                          }}
                         >
+                          <span
+                            className="hotTopicsDragHandle"
+                            aria-hidden="true"
+                          >
+                            <GripVertical size={14} />
+                          </span>
                           <span className="hotTopicsRank">{index + 1}</span>
                           <span className="hotTopicsListMain">
                             <span className="hotTopicsListTitle">
