@@ -18,7 +18,7 @@ const { Text } = Typography;
 const STORAGE_PREFIX = "english-hot-topics";
 const HOT_TOPIC_NOTE_MAX_LENGTH = 180;
 const PERSONAL_NOTE_TITLE_MAX_LENGTH = 28;
-const PERSONAL_NOTE_CONTENT_MAX_LENGTH = 600;
+const PERSONAL_NOTE_CONTENT_MAX_LENGTH = 1000;
 const DEFAULT_MAX_ITEMS = 6;
 
 type PersonalNote = {
