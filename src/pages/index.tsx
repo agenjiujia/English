@@ -17,6 +17,7 @@ import type { ColumnsType } from "antd/es/table";
 import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
 import { HotTopicsPanel } from "@/components/HotTopicsPanel";
+import { QuizPanel } from "@/components/QuizPanel";
 import { StudyCountTag } from "@/components/StudyCountTag";
 import {
   StudyCelebration,
@@ -687,6 +688,7 @@ export default function GrammarHome() {
           />
           <StudyCelebration celebration={celebration.celebration} />
           <HotTopicsPanel pageKey="grammar" items={hotTopicItems} />
+          <QuizPanel pageKey="grammar" />
           <DoubaoChatWidget />
           <FloatButton.BackTop />
         </Layout>
