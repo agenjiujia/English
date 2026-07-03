@@ -224,107 +224,115 @@ export function DataBackupWidget({
           </div>
 
           <div className="dataBackupBody">
-            <div className="dataBackupGauge">
-              <div className="dataBackupGaugeTop">
-                <span className="dataBackupGaugeLabel">浏览器存储占用</span>
-                {estimate && estimate.supported ? (
-                  <span className="dataBackupGaugePercent">
-                    {estimate.percent.toFixed(estimate.percent < 1 ? 2 : 0)}%
-                  </span>
-                ) : (
-                  <span className="dataBackupGaugePercent">不支持</span>
-                )}
-              </div>
-              <div className="dataBackupGaugeTrack">
-                <div
-                  className="dataBackupGaugeFill"
-                  style={{
-                    width: `${Math.max(
-                      estimate?.percent ?? 0,
-                      estimate && estimate.usage > 0 ? 1.5 : 0,
-                    )}%`,
-                  }}
-                />
-              </div>
-              {estimate && estimate.supported ? (
-                <div className="dataBackupGaugeMeta">
-                  已用 {formatBytes(estimate.usage)} / 总配额{" "}
-                  {formatBytes(estimate.quota)}
-                  <span className="dataBackupGaugeFree">
-                    （剩余约{" "}
-                    {formatBytes(Math.max(estimate.quota - estimate.usage, 0))}
-                    ）
-                  </span>
+            {!pendingImport && (
+              <>
+                <div className="dataBackupGauge">
+                  <div className="dataBackupGaugeTop">
+                    <span className="dataBackupGaugeLabel">浏览器存储占用</span>
+                    {estimate && estimate.supported ? (
+                      <span className="dataBackupGaugePercent">
+                        {estimate.percent.toFixed(estimate.percent < 1 ? 2 : 0)}
+                        %
+                      </span>
+                    ) : (
+                      <span className="dataBackupGaugePercent">不支持</span>
+                    )}
+                  </div>
+                  <div className="dataBackupGaugeTrack">
+                    <div
+                      className="dataBackupGaugeFill"
+                      style={{
+                        width: `${Math.max(
+                          estimate?.percent ?? 0,
+                          estimate && estimate.usage > 0 ? 1.5 : 0,
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                  {estimate && estimate.supported ? (
+                    <div className="dataBackupGaugeMeta">
+                      已用 {formatBytes(estimate.usage)} / 总配额{" "}
+                      {formatBytes(estimate.quota)}
+                      <span className="dataBackupGaugeFree">
+                        （剩余约{" "}
+                        {formatBytes(
+                          Math.max(estimate.quota - estimate.usage, 0),
+                        )}
+                        ）
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="dataBackupGaugeMeta">
+                      当前浏览器不支持容量估算，仅展示各分类占用体积
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="dataBackupGaugeMeta">
-                  当前浏览器不支持容量估算，仅展示各分类占用体积
+
+                <div className="dataBackupBreakdown">
+                  <div className="dataBackupBreakdownHead">
+                    <span>内容占用明细</span>
+                    <span className="dataBackupBreakdownTotal">
+                      合计 {formatBytes(totalKnownBytes)}
+                    </span>
+                  </div>
+                  {loading && !breakdown.length ? (
+                    <div className="dataBackupLoading">
+                      <Spin size="small" />
+                    </div>
+                  ) : (
+                    <ul className="dataBackupCategoryList">
+                      {breakdown.map((item) => {
+                        const share =
+                          totalKnownBytes > 0
+                            ? (item.bytes / totalKnownBytes) * 100
+                            : 0;
+                        const color = CATEGORY_COLORS[item.key] || "#2f8f83";
+                        return (
+                          <li key={item.key} className="dataBackupCategory">
+                            <div className="dataBackupCategoryTop">
+                              <span className="dataBackupCategoryName">
+                                <span
+                                  className="dataBackupCategoryDot"
+                                  style={{ background: color }}
+                                />
+                                {item.label}
+                              </span>
+                              <span className="dataBackupCategorySize">
+                                {formatBytes(item.bytes)}
+                              </span>
+                            </div>
+                            <div className="dataBackupCategoryTrack">
+                              <div
+                                className="dataBackupCategoryFill"
+                                style={{
+                                  width: `${Math.max(share, item.bytes > 0 ? 2 : 0)}%`,
+                                  background: color,
+                                }}
+                              />
+                            </div>
+                            <div className="dataBackupCategoryDesc">
+                              {item.description}
+                              {item.itemCount > 0
+                                ? ` · ${item.itemCount} 条`
+                                : ""}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <div className="dataBackupBreakdown">
-              <div className="dataBackupBreakdownHead">
-                <span>内容占用明细</span>
-                <span className="dataBackupBreakdownTotal">
-                  合计 {formatBytes(totalKnownBytes)}
-                </span>
-              </div>
-              {loading && !breakdown.length ? (
-                <div className="dataBackupLoading">
-                  <Spin size="small" />
-                </div>
-              ) : (
-                <ul className="dataBackupCategoryList">
-                  {breakdown.map((item) => {
-                    const share =
-                      totalKnownBytes > 0
-                        ? (item.bytes / totalKnownBytes) * 100
-                        : 0;
-                    const color = CATEGORY_COLORS[item.key] || "#2f8f83";
-                    return (
-                      <li key={item.key} className="dataBackupCategory">
-                        <div className="dataBackupCategoryTop">
-                          <span className="dataBackupCategoryName">
-                            <span
-                              className="dataBackupCategoryDot"
-                              style={{ background: color }}
-                            />
-                            {item.label}
-                          </span>
-                          <span className="dataBackupCategorySize">
-                            {formatBytes(item.bytes)}
-                          </span>
-                        </div>
-                        <div className="dataBackupCategoryTrack">
-                          <div
-                            className="dataBackupCategoryFill"
-                            style={{
-                              width: `${Math.max(share, item.bytes > 0 ? 2 : 0)}%`,
-                              background: color,
-                            }}
-                          />
-                        </div>
-                        <div className="dataBackupCategoryDesc">
-                          {item.description}
-                          {item.itemCount > 0 ? ` · ${item.itemCount} 条` : ""}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-
-            {message ? (
-              <Alert
-                type={message.type}
-                message={message.text}
-                showIcon
-                className="dataBackupAlert"
-              />
-            ) : null}
-
+                {message ? (
+                  <Alert
+                    type={message.type}
+                    message={message.text}
+                    showIcon
+                    className="dataBackupAlert"
+                  />
+                ) : null}
+              </>
+            )}
             {pendingImport ? (
               <div className="dataBackupImportConfirm">
                 <div className="dataBackupImportInfo">
