@@ -24,6 +24,7 @@ import {
   useStudyCelebration,
 } from "@/components/StudyCelebration";
 import { DoubaoChatWidget } from "@/components/DoubaoChatWidget";
+import { DataBackupWidget } from "@/components/DataBackupWidget";
 import { useStudyProgress } from "@/components/StudyProgress";
 import {
   AnnotationToolbar,
@@ -451,7 +452,13 @@ export default function GrammarHome() {
         order: index,
         onOpen: () => scrollToElementById(topic.id),
       })),
-    [allTopics, noteCountByTopicId, progress, progress.masteredIds, progress.studyCounts],
+    [
+      allTopics,
+      noteCountByTopicId,
+      progress,
+      progress.masteredIds,
+      progress.studyCounts,
+    ],
   );
   const masteredCount = allTopics.filter((topic) =>
     progress.isMastered(topic.id),
@@ -689,6 +696,7 @@ export default function GrammarHome() {
           <StudyCelebration celebration={celebration.celebration} />
           <HotTopicsPanel pageKey="grammar" items={hotTopicItems} />
           <QuizPanel pageKey="grammar" />
+          <DataBackupWidget />
           <DoubaoChatWidget />
           <FloatButton.BackTop />
         </Layout>

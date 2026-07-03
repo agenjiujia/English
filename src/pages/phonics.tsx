@@ -21,6 +21,7 @@ import {
   useStudyCelebration,
 } from "@/components/StudyCelebration";
 import { DoubaoChatWidget } from "@/components/DoubaoChatWidget";
+import { DataBackupWidget } from "@/components/DataBackupWidget";
 import { useStudyProgress } from "@/components/StudyProgress";
 import {
   AnnotationToolbar,
@@ -708,7 +709,13 @@ export default function PhonicsPage() {
           onOpen: () => scrollToElementById(section.id),
         }));
       }),
-    [annotations.annotations, phonicsStages, progress, progress.masteredIds, progress.studyCounts],
+    [
+      annotations.annotations,
+      phonicsStages,
+      progress,
+      progress.masteredIds,
+      progress.studyCounts,
+    ],
   );
   const masteryPercent =
     trackablePhonicsSections.length > 0
@@ -779,207 +786,208 @@ export default function PhonicsPage() {
       deleteNote={annotations.deleteNote}
     >
       <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#2f8f83",
-          borderRadius: 14,
-          fontFamily:
-            '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif',
-        },
-        components: {
-          Card: {
-            headerBg: "#fffaf0",
+        theme={{
+          token: {
+            colorPrimary: "#2f8f83",
+            borderRadius: 14,
+            fontFamily:
+              '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif',
           },
-        },
-      }}
-    >
-      <Layout className="pageShell">
-        <Sider width={292} className="leftRail">
-          <div className="tocPanel">
-            <div className="tocHead">
-              <MapPinned size={18} />
-              <Text strong>自然拼读目录</Text>
-            </div>
-            <div className="tocProgress">
-              <div className="tocProgressMeta">
-                <span>掌握进度</span>
-                <strong>{masteryPercent}%</strong>
+          components: {
+            Card: {
+              headerBg: "#fffaf0",
+            },
+          },
+        }}
+      >
+        <Layout className="pageShell">
+          <Sider width={292} className="leftRail">
+            <div className="tocPanel">
+              <div className="tocHead">
+                <MapPinned size={18} />
+                <Text strong>自然拼读目录</Text>
               </div>
-              <div className="tocProgressTrack">
-                <div
-                  className="tocProgressBar"
-                  style={{ width: `${masteryPercent}%` }}
-                />
-              </div>
-              <div className="tocProgressCount">
-                已掌握 {masteredCount} / {trackablePhonicsSections.length}
-              </div>
-            </div>
-            <div className="tocScroll">
-              <Anchor
-                affix={false}
-                offsetTop={24}
-                items={anchorItems}
-                className="tocAnchor"
-                onClick={handleAnchorClick}
-              />
-            </div>
-          </div>
-        </Sider>
-
-        <Content className="content">
-          <header className="hero">
-            <div className="heroBadge">
-              <GraduationCap size={18} />
-              <span>自然拼读体系 · 课程化编排</span>
-            </div>
-            <Title className="heroTitle">自然拼读系统知识库</Title>
-            <Paragraph className="heroText">
-              <MarkableText
-                id="phonics-hero-text"
-                text="本课程按初学者可理解的顺序系统学习自然拼读：字母和音素、音节拆分、重音判断、六大音节类型、长短元音、弱读、清浊辅音、Y/W 的特殊作用、辅音组合、C/G 软硬音、元音组合、r 控制、静音字母、词尾规则和高频例外。每个规则都配例词与纠错提醒，并强调自然拼读是高概率系统，遇到例外要用音标和真实发音校正。这是三大系统的起点页。"
-                annotations={annotations.getAnnotations("phonics-hero-text")}
-              />
-            </Paragraph>
-            <div className="heroStats">
-              <div>
-                <strong>{phonicsStages.length}</strong>
-                <span>学习阶段</span>
-              </div>
-              <div>
-                <strong>{masteryPercent}%</strong>
-                <span>掌握进度</span>
-              </div>
-              <div>
-                <strong>90</strong>
-                <span>天训练</span>
-              </div>
-            </div>
-          </header>
-
-          <div className="routeCard">
-            <BookOpen size={20} />
-            <span>
-              <MarkableText
-                id="phonics-route"
-                text="学习路线：先分清字母、音素、元音和辅音，建立拼读总流程；再学习音节拆分、重音、开闭音节、魔法 e 和弱读；接着掌握辅音组合、元音组合、r 控制、静音字母和词尾变化；最后用高频例外、必考单词、底层逻辑和 90 天训练反复巩固。完成本页后，建议进入《英语语法知识库》，最后学习《英语剩余知识点系统》。"
-                annotations={annotations.getAnnotations("phonics-route")}
-              />
-            </span>
-          </div>
-
-          {phonicsStages.map((stage, stageIndex) => (
-            <section key={stage.id} id={stage.id} className="stageSection">
-              <Card className="stageCard">
-                <div className="stageNumber">
-                  阶段 {String(stageIndex + 1).padStart(2, "0")}
+              <div className="tocProgress">
+                <div className="tocProgressMeta">
+                  <span>掌握进度</span>
+                  <strong>{masteryPercent}%</strong>
                 </div>
-                <Title level={2} className="stageTitle">
-                  {stage.title}
-                </Title>
-                <Paragraph className="stageDescription">
-                  {stage.description}
-                </Paragraph>
-              </Card>
-              {stageIndex === 0 ? (
-                <PhonicsCombinedStageCard
-                  stage={stage}
-                  number={`${stageIndex + 1}.1`}
-                  getAnnotations={annotations.getAnnotations}
-                  mastered={stage.sections.every((section) =>
-                    progress.isMastered(section.id),
-                  )}
-                  studyCount={progress.getStudyCount(stage.id)}
-                  onToggleMastered={() => handleToggleStageMastered(stage)}
-                  onIncrementStudyCount={() =>
-                    progress.incrementStudyCount(stage.id)
-                  }
-                  onDecrementStudyCount={() =>
-                    progress.decrementStudyCount(stage.id)
-                  }
-                  onSetStudyCount={(count) =>
-                    progress.setStudyCount(stage.id, count)
-                  }
+                <div className="tocProgressTrack">
+                  <div
+                    className="tocProgressBar"
+                    style={{ width: `${masteryPercent}%` }}
+                  />
+                </div>
+                <div className="tocProgressCount">
+                  已掌握 {masteredCount} / {trackablePhonicsSections.length}
+                </div>
+              </div>
+              <div className="tocScroll">
+                <Anchor
+                  affix={false}
+                  offsetTop={24}
+                  items={anchorItems}
+                  className="tocAnchor"
+                  onClick={handleAnchorClick}
                 />
-              ) : (
-                stage.sections.map((section, sectionIndex) => (
-                  <PhonicsSectionCard
-                    key={section.id}
-                    section={section}
-                    number={`${stageIndex + 1}.${sectionIndex + 1}`}
+              </div>
+            </div>
+          </Sider>
+
+          <Content className="content">
+            <header className="hero">
+              <div className="heroBadge">
+                <GraduationCap size={18} />
+                <span>自然拼读体系 · 课程化编排</span>
+              </div>
+              <Title className="heroTitle">自然拼读系统知识库</Title>
+              <Paragraph className="heroText">
+                <MarkableText
+                  id="phonics-hero-text"
+                  text="本课程按初学者可理解的顺序系统学习自然拼读：字母和音素、音节拆分、重音判断、六大音节类型、长短元音、弱读、清浊辅音、Y/W 的特殊作用、辅音组合、C/G 软硬音、元音组合、r 控制、静音字母、词尾规则和高频例外。每个规则都配例词与纠错提醒，并强调自然拼读是高概率系统，遇到例外要用音标和真实发音校正。这是三大系统的起点页。"
+                  annotations={annotations.getAnnotations("phonics-hero-text")}
+                />
+              </Paragraph>
+              <div className="heroStats">
+                <div>
+                  <strong>{phonicsStages.length}</strong>
+                  <span>学习阶段</span>
+                </div>
+                <div>
+                  <strong>{masteryPercent}%</strong>
+                  <span>掌握进度</span>
+                </div>
+                <div>
+                  <strong>90</strong>
+                  <span>天训练</span>
+                </div>
+              </div>
+            </header>
+
+            <div className="routeCard">
+              <BookOpen size={20} />
+              <span>
+                <MarkableText
+                  id="phonics-route"
+                  text="学习路线：先分清字母、音素、元音和辅音，建立拼读总流程；再学习音节拆分、重音、开闭音节、魔法 e 和弱读；接着掌握辅音组合、元音组合、r 控制、静音字母和词尾变化；最后用高频例外、必考单词、底层逻辑和 90 天训练反复巩固。完成本页后，建议进入《英语语法知识库》，最后学习《英语剩余知识点系统》。"
+                  annotations={annotations.getAnnotations("phonics-route")}
+                />
+              </span>
+            </div>
+
+            {phonicsStages.map((stage, stageIndex) => (
+              <section key={stage.id} id={stage.id} className="stageSection">
+                <Card className="stageCard">
+                  <div className="stageNumber">
+                    阶段 {String(stageIndex + 1).padStart(2, "0")}
+                  </div>
+                  <Title level={2} className="stageTitle">
+                    {stage.title}
+                  </Title>
+                  <Paragraph className="stageDescription">
+                    {stage.description}
+                  </Paragraph>
+                </Card>
+                {stageIndex === 0 ? (
+                  <PhonicsCombinedStageCard
+                    stage={stage}
+                    number={`${stageIndex + 1}.1`}
                     getAnnotations={annotations.getAnnotations}
-                    mastered={progress.isMastered(section.id)}
-                    studyCount={progress.getStudyCount(section.id)}
-                    onToggleMastered={() =>
-                      handleToggleSectionMastered(section)
-                    }
+                    mastered={stage.sections.every((section) =>
+                      progress.isMastered(section.id),
+                    )}
+                    studyCount={progress.getStudyCount(stage.id)}
+                    onToggleMastered={() => handleToggleStageMastered(stage)}
                     onIncrementStudyCount={() =>
-                      progress.incrementStudyCount(section.id)
+                      progress.incrementStudyCount(stage.id)
                     }
                     onDecrementStudyCount={() =>
-                      progress.decrementStudyCount(section.id)
+                      progress.decrementStudyCount(stage.id)
                     }
                     onSetStudyCount={(count) =>
-                      progress.setStudyCount(section.id, count)
+                      progress.setStudyCount(stage.id, count)
                     }
                   />
-                ))
-              )}
-            </section>
-          ))}
-        </Content>
+                ) : (
+                  stage.sections.map((section, sectionIndex) => (
+                    <PhonicsSectionCard
+                      key={section.id}
+                      section={section}
+                      number={`${stageIndex + 1}.${sectionIndex + 1}`}
+                      getAnnotations={annotations.getAnnotations}
+                      mastered={progress.isMastered(section.id)}
+                      studyCount={progress.getStudyCount(section.id)}
+                      onToggleMastered={() =>
+                        handleToggleSectionMastered(section)
+                      }
+                      onIncrementStudyCount={() =>
+                        progress.incrementStudyCount(section.id)
+                      }
+                      onDecrementStudyCount={() =>
+                        progress.decrementStudyCount(section.id)
+                      }
+                      onSetStudyCount={(count) =>
+                        progress.setStudyCount(section.id, count)
+                      }
+                    />
+                  ))
+                )}
+              </section>
+            ))}
+          </Content>
 
-        <aside className="encouragementRail" aria-label="学习鼓励语">
-          <div className="encouragementCard">
-            <div className="encouragementText">
-              {[...encouragement].map((char, index) => (
-                <span
-                  key={`${char}-${index}`}
-                  className="encouragementChar"
-                  style={
-                    {
-                      "--char-index": index,
-                    } as React.CSSProperties
-                  }
-                >
-                  {char}
-                </span>
-              ))}
+          <aside className="encouragementRail" aria-label="学习鼓励语">
+            <div className="encouragementCard">
+              <div className="encouragementText">
+                {[...encouragement].map((char, index) => (
+                  <span
+                    key={`${char}-${index}`}
+                    className="encouragementChar"
+                    style={
+                      {
+                        "--char-index": index,
+                      } as React.CSSProperties
+                    }
+                  >
+                    {char}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        </aside>
+          </aside>
 
-        <aside className="sideActionRail" aria-label="返回语法入口">
-          <Button
-            className="sideActionButton"
-            onClick={() => {
-              goToRoute("/");
-            }}
-          >
-            返回语法知识库
-          </Button>
-          <Button
-            className="sideActionButton"
-            onClick={() => {
-              goToRoute("/remaining");
-            }}
-          >
-            查看剩余英语能力知识点
-          </Button>
-        </aside>
+          <aside className="sideActionRail" aria-label="返回语法入口">
+            <Button
+              className="sideActionButton"
+              onClick={() => {
+                goToRoute("/");
+              }}
+            >
+              返回语法知识库
+            </Button>
+            <Button
+              className="sideActionButton"
+              onClick={() => {
+                goToRoute("/remaining");
+              }}
+            >
+              查看剩余英语能力知识点
+            </Button>
+          </aside>
 
-        <AnnotationToolbar
-          selection={annotations.selection}
-          applyAnnotation={annotations.applyAnnotation}
+          <AnnotationToolbar
+            selection={annotations.selection}
+            applyAnnotation={annotations.applyAnnotation}
             applyAnnotationAtSelection={annotations.applyAnnotationAtSelection}
-          clearSelection={annotations.clearSelection}
-          clearAll={annotations.clearAll}
-        />
-        <StudyCelebration celebration={celebration.celebration} />
-        <HotTopicsPanel pageKey="phonics" items={hotTopicItems} />
-        <DoubaoChatWidget />
-        <FloatButton.BackTop />
-      </Layout>
+            clearSelection={annotations.clearSelection}
+            clearAll={annotations.clearAll}
+          />
+          <StudyCelebration celebration={celebration.celebration} />
+          <HotTopicsPanel pageKey="phonics" items={hotTopicItems} />
+          <DataBackupWidget variant="noQuiz" />
+          <DoubaoChatWidget />
+          <FloatButton.BackTop />
+        </Layout>
       </ConfigProvider>
     </StudyAnnotationsProvider>
   );

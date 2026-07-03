@@ -23,6 +23,7 @@ import {
   useStudyCelebration,
 } from "@/components/StudyCelebration";
 import { DoubaoChatWidget } from "@/components/DoubaoChatWidget";
+import { DataBackupWidget } from "@/components/DataBackupWidget";
 import { useStudyProgress } from "@/components/StudyProgress";
 import {
   AnnotationToolbar,
@@ -357,7 +358,13 @@ export default function RemainingKnowledgePage() {
         order: index,
         onOpen: () => scrollToElementById(topic.id),
       })),
-    [noteCountByTopicId, orderedTopics, progress, progress.masteredIds, progress.studyCounts],
+    [
+      noteCountByTopicId,
+      orderedTopics,
+      progress,
+      progress.masteredIds,
+      progress.studyCounts,
+    ],
   );
   const masteredCount = orderedTopics.filter((topic) =>
     progress.isMastered(topic.id),
@@ -405,187 +412,190 @@ export default function RemainingKnowledgePage() {
       deleteNote={annotations.deleteNote}
     >
       <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: "#2f8f83",
-          borderRadius: 14,
-          fontFamily:
-            '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif',
-        },
-        components: {
-          Card: {
-            headerBg: "#fffaf0",
+        theme={{
+          token: {
+            colorPrimary: "#2f8f83",
+            borderRadius: 14,
+            fontFamily:
+              '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif',
           },
-          Table: {
-            headerBg: "#f6efe0",
-            rowHoverBg: "#fff9eb",
+          components: {
+            Card: {
+              headerBg: "#fffaf0",
+            },
+            Table: {
+              headerBg: "#f6efe0",
+              rowHoverBg: "#fff9eb",
+            },
           },
-        },
-      }}
-    >
-      <Layout className="pageShell">
-        <Sider width={292} className="leftRail">
-          <div className="tocPanel">
-            <div className="tocHead">
-              <MapPinned size={18} />
-              <Text strong>剩余知识点目录</Text>
-            </div>
-            <div className="tocProgress">
-              <div className="tocProgressMeta">
-                <span>掌握进度</span>
-                <strong>{masteryPercent}%</strong>
+        }}
+      >
+        <Layout className="pageShell">
+          <Sider width={292} className="leftRail">
+            <div className="tocPanel">
+              <div className="tocHead">
+                <MapPinned size={18} />
+                <Text strong>剩余知识点目录</Text>
               </div>
-              <div className="tocProgressTrack">
-                <div
-                  className="tocProgressBar"
-                  style={{ width: `${masteryPercent}%` }}
-                />
-              </div>
-              <div className="tocProgressCount">
-                已掌握 {masteredCount} / {orderedTopics.length}
-              </div>
-            </div>
-            <div className="tocScroll">
-              <Anchor
-                affix={false}
-                offsetTop={24}
-                items={anchorItems}
-                className="tocAnchor"
-                onClick={handleAnchorClick}
-              />
-            </div>
-          </div>
-        </Sider>
-
-        <Content className="content">
-          <header className="hero">
-            <div className="heroBadge">
-              <GraduationCap size={18} />
-              <span>完整英语能力 · Grammar 之外</span>
-            </div>
-            <Title className="heroTitle">英语剩余知识点系统</Title>
-            <Paragraph className="heroText">
-              <MarkableText
-                id="remaining-hero-text"
-                text="本课程系统补齐语法之外的完整英语能力：语音听辨、拼写书写、发音韵律、词汇网络、词法构词、阅读策略、写作表达、听说交流、语义语用、跨文化交际、文学修辞、学术英语、研究能力、考试策略和数字素养。它不是重复语法，而是把英语从“会做题”提升到“会阅读、会表达、会交流、会研究”的综合能力系统。"
-                annotations={annotations.getAnnotations("remaining-hero-text")}
-              />
-            </Paragraph>
-            <div className="heroStats">
-              <div>
-                <strong>{orderedTopics.length}</strong>
-                <span>知识点</span>
-              </div>
-              <div>
-                <strong>{masteryPercent}%</strong>
-                <span>掌握进度</span>
-              </div>
-              <div>
-                <strong>系统</strong>
-                <span>综合能力</span>
-              </div>
-            </div>
-          </header>
-
-          <div className="routeCard">
-            <BookOpen size={20} />
-            <span>
-              <MarkableText
-                id="remaining-route"
-                text="学习路线：建议先完成《自然拼读系统知识库》和《英语语法知识库》再学习本页。先用音素听辨、拼写和书写规范打底，再建立词汇网络、工具书习惯和词法构词能力；接着进入阅读策略、写作表达、听说展示和真实语境沟通；在通用能力稳定后再做文学修辞体裁；最后提升到学术研究、数字素养、考试策略和复盘能力。全部掌握后，你会不只是“懂语法”，而是能更自信地读英文材料、写清楚观点、听懂真实表达、开口沟通，并逐步具备用英语学习新知识的能力。"
-                annotations={annotations.getAnnotations("remaining-route")}
-              />
-            </span>
-          </div>
-
-          {stagedTopics.map((stage, stageIndex) => (
-            <section key={stage.id} id={stage.id} className="stageSection">
-              <Card className="stageCard">
-                <div className="stageNumber">
-                  阶段 {String(stageIndex + 1).padStart(2, "0")}
+              <div className="tocProgress">
+                <div className="tocProgressMeta">
+                  <span>掌握进度</span>
+                  <strong>{masteryPercent}%</strong>
                 </div>
-                <Title level={2} className="stageTitle">
-                  {stage.title}
-                </Title>
-                <Paragraph className="stageDescription">
-                  {stage.description}
-                </Paragraph>
-              </Card>
-              {stage.topics.map((topic, topicIndex) => (
-                <TopicCard
-                  key={topic.id}
-                  topic={topic}
-                  number={`${stageIndex + 1}.${topicIndex + 1}`}
-                  getAnnotations={annotations.getAnnotations}
-                  mastered={progress.isMastered(topic.id)}
-                  studyCount={progress.getStudyCount(topic.id)}
-                  onToggleMastered={() => handleToggleTopicMastered(topic)}
-                  onIncrementStudyCount={() =>
-                    progress.incrementStudyCount(topic.id)
-                  }
-                  onDecrementStudyCount={() =>
-                    progress.decrementStudyCount(topic.id)
-                  }
-                  onSetStudyCount={(count) =>
-                    progress.setStudyCount(topic.id, count)
-                  }
+                <div className="tocProgressTrack">
+                  <div
+                    className="tocProgressBar"
+                    style={{ width: `${masteryPercent}%` }}
+                  />
+                </div>
+                <div className="tocProgressCount">
+                  已掌握 {masteredCount} / {orderedTopics.length}
+                </div>
+              </div>
+              <div className="tocScroll">
+                <Anchor
+                  affix={false}
+                  offsetTop={24}
+                  items={anchorItems}
+                  className="tocAnchor"
+                  onClick={handleAnchorClick}
                 />
-              ))}
-            </section>
-          ))}
-        </Content>
-
-        <aside className="encouragementRail" aria-label="学习鼓励语">
-          <div className="encouragementCard">
-            <div className="encouragementText">
-              {[...encouragement].map((char, index) => (
-                <span
-                  key={`${char}-${index}`}
-                  className="encouragementChar"
-                  style={
-                    {
-                      "--char-index": index,
-                    } as React.CSSProperties
-                  }
-                >
-                  {char}
-                </span>
-              ))}
+              </div>
             </div>
-          </div>
-        </aside>
+          </Sider>
 
-        <aside className="sideActionRail" aria-label="返回语法入口">
-          <Button
-            className="sideActionButton"
-            onClick={() => {
-              goToRoute("/");
-            }}
-          >
-            返回语法知识库
-          </Button>
-          <Button
-            className="sideActionButton"
-            onClick={() => {
-              goToRoute("/phonics");
-            }}
-          >
-            查看自然拼读系统知识库
-          </Button>
-        </aside>
+          <Content className="content">
+            <header className="hero">
+              <div className="heroBadge">
+                <GraduationCap size={18} />
+                <span>完整英语能力 · Grammar 之外</span>
+              </div>
+              <Title className="heroTitle">英语剩余知识点系统</Title>
+              <Paragraph className="heroText">
+                <MarkableText
+                  id="remaining-hero-text"
+                  text="本课程系统补齐语法之外的完整英语能力：语音听辨、拼写书写、发音韵律、词汇网络、词法构词、阅读策略、写作表达、听说交流、语义语用、跨文化交际、文学修辞、学术英语、研究能力、考试策略和数字素养。它不是重复语法，而是把英语从“会做题”提升到“会阅读、会表达、会交流、会研究”的综合能力系统。"
+                  annotations={annotations.getAnnotations(
+                    "remaining-hero-text",
+                  )}
+                />
+              </Paragraph>
+              <div className="heroStats">
+                <div>
+                  <strong>{orderedTopics.length}</strong>
+                  <span>知识点</span>
+                </div>
+                <div>
+                  <strong>{masteryPercent}%</strong>
+                  <span>掌握进度</span>
+                </div>
+                <div>
+                  <strong>系统</strong>
+                  <span>综合能力</span>
+                </div>
+              </div>
+            </header>
 
-        <AnnotationToolbar
-          selection={annotations.selection}
-          applyAnnotation={annotations.applyAnnotation}
+            <div className="routeCard">
+              <BookOpen size={20} />
+              <span>
+                <MarkableText
+                  id="remaining-route"
+                  text="学习路线：建议先完成《自然拼读系统知识库》和《英语语法知识库》再学习本页。先用音素听辨、拼写和书写规范打底，再建立词汇网络、工具书习惯和词法构词能力；接着进入阅读策略、写作表达、听说展示和真实语境沟通；在通用能力稳定后再做文学修辞体裁；最后提升到学术研究、数字素养、考试策略和复盘能力。全部掌握后，你会不只是“懂语法”，而是能更自信地读英文材料、写清楚观点、听懂真实表达、开口沟通，并逐步具备用英语学习新知识的能力。"
+                  annotations={annotations.getAnnotations("remaining-route")}
+                />
+              </span>
+            </div>
+
+            {stagedTopics.map((stage, stageIndex) => (
+              <section key={stage.id} id={stage.id} className="stageSection">
+                <Card className="stageCard">
+                  <div className="stageNumber">
+                    阶段 {String(stageIndex + 1).padStart(2, "0")}
+                  </div>
+                  <Title level={2} className="stageTitle">
+                    {stage.title}
+                  </Title>
+                  <Paragraph className="stageDescription">
+                    {stage.description}
+                  </Paragraph>
+                </Card>
+                {stage.topics.map((topic, topicIndex) => (
+                  <TopicCard
+                    key={topic.id}
+                    topic={topic}
+                    number={`${stageIndex + 1}.${topicIndex + 1}`}
+                    getAnnotations={annotations.getAnnotations}
+                    mastered={progress.isMastered(topic.id)}
+                    studyCount={progress.getStudyCount(topic.id)}
+                    onToggleMastered={() => handleToggleTopicMastered(topic)}
+                    onIncrementStudyCount={() =>
+                      progress.incrementStudyCount(topic.id)
+                    }
+                    onDecrementStudyCount={() =>
+                      progress.decrementStudyCount(topic.id)
+                    }
+                    onSetStudyCount={(count) =>
+                      progress.setStudyCount(topic.id, count)
+                    }
+                  />
+                ))}
+              </section>
+            ))}
+          </Content>
+
+          <aside className="encouragementRail" aria-label="学习鼓励语">
+            <div className="encouragementCard">
+              <div className="encouragementText">
+                {[...encouragement].map((char, index) => (
+                  <span
+                    key={`${char}-${index}`}
+                    className="encouragementChar"
+                    style={
+                      {
+                        "--char-index": index,
+                      } as React.CSSProperties
+                    }
+                  >
+                    {char}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          <aside className="sideActionRail" aria-label="返回语法入口">
+            <Button
+              className="sideActionButton"
+              onClick={() => {
+                goToRoute("/");
+              }}
+            >
+              返回语法知识库
+            </Button>
+            <Button
+              className="sideActionButton"
+              onClick={() => {
+                goToRoute("/phonics");
+              }}
+            >
+              查看自然拼读系统知识库
+            </Button>
+          </aside>
+
+          <AnnotationToolbar
+            selection={annotations.selection}
+            applyAnnotation={annotations.applyAnnotation}
             applyAnnotationAtSelection={annotations.applyAnnotationAtSelection}
-          clearSelection={annotations.clearSelection}
-          clearAll={annotations.clearAll}
-        />
-        <StudyCelebration celebration={celebration.celebration} />
-        <HotTopicsPanel pageKey="remaining" items={hotTopicItems} />
-        <DoubaoChatWidget />
-        <FloatButton.BackTop />
-      </Layout>
+            clearSelection={annotations.clearSelection}
+            clearAll={annotations.clearAll}
+          />
+          <StudyCelebration celebration={celebration.celebration} />
+          <HotTopicsPanel pageKey="remaining" items={hotTopicItems} />
+          <DataBackupWidget variant="noQuiz" />
+          <DoubaoChatWidget />
+          <FloatButton.BackTop />
+        </Layout>
       </ConfigProvider>
     </StudyAnnotationsProvider>
   );
