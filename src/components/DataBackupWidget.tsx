@@ -4,6 +4,7 @@ import {
   DatabaseZap,
   Download,
   HardDriveDownload,
+  HelpCircle,
   RefreshCw,
   Upload,
   X,
@@ -33,6 +34,11 @@ const CATEGORY_COLORS: Record<string, string> = {
   progress: "#4c86c6",
   quiz: "#b45309",
   dictionary: "#8a8f98",
+};
+
+const CATEGORY_HINTS: Record<string, string> = {
+  dictionary:
+    "在正文划词查询单词时，会把该词的释义、音标、例句缓存到浏览器（按单词去重）。“条数”是查过的不同单词数量，体积是这些释义的 JSON 总大小。清空后，下次查词会自动重新下载。",
 };
 
 export function DataBackupWidget({
@@ -287,6 +293,7 @@ export function DataBackupWidget({
                             ? (item.bytes / totalKnownBytes) * 100
                             : 0;
                         const color = CATEGORY_COLORS[item.key] || "#2f8f83";
+                        const hint = CATEGORY_HINTS[item.key];
                         return (
                           <li key={item.key} className="dataBackupCategory">
                             <div className="dataBackupCategoryTop">
@@ -296,6 +303,18 @@ export function DataBackupWidget({
                                   style={{ background: color }}
                                 />
                                 {item.label}
+                                {hint ? (
+                                  <Tooltip title={hint}>
+                                    <span
+                                      className="dataBackupCategoryHelp"
+                                      role="button"
+                                      tabIndex={0}
+                                      aria-label={`${item.label}说明`}
+                                    >
+                                      <HelpCircle size={13} />
+                                    </span>
+                                  </Tooltip>
+                                ) : null}
                               </span>
                               <span className="dataBackupCategorySize">
                                 {formatBytes(item.bytes)}
