@@ -978,7 +978,7 @@ export function AnnotationToolbar({
               >
                 清除所选
               </button>
-              <Popconfirm
+              {/* <Popconfirm
                 title="清空本页所有标记？"
                 okText="清空"
                 cancelText="取消"
@@ -991,7 +991,7 @@ export function AnnotationToolbar({
                 >
                   清空本页
                 </button>
-              </Popconfirm>
+              </Popconfirm> */}
             </div>
           </div>
 
