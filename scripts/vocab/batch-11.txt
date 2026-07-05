@@ -1,0 +1,300 @@
+weak	adj.	weak的/地	weak result
+wealthy	adj.	wealthy的/地	wealthy result
+weekly	adj.	weekly的/地	weekly result
+weird	adj.	weird的/地	weird result
+western	adj.	western的/地	western result
+wide	adj.	wide的/地	wide result
+widespread	adj.	widespread的/地	widespread result
+willing	adj.	willing的/地	willing result
+wise	adj.	wise的/地	wise result
+wonderful	adj.	wonderful的/地	wonderful result
+wooden	adj.	wooden的/地	wooden result
+working	adj.	working的/地	working result
+worldwide	adj.	worldwide的/地	worldwide result
+worse	adj.	worse的/地	worse result
+worst	adj.	worst的/地	worst result
+worthwhile	adj.	worthwhile的/地	worthwhile result
+worthy	adj.	worthy的/地	worthy result
+wrong	adj.	wrong的/地	wrong result
+yellow	adj.	yellow的/地	yellow result
+young	adj.	young的/地	young result
+youthful	adj.	youthful的/地	youthful result
+look forward to	phr.	盼望	look forward to doing
+give up	phr.	放弃	give up smoking
+take part in	phr.	参加	take part in the game
+take care of	phr.	照顾	take care of children
+get along with	phr.	与…相处	get along with colleagues
+get over	phr.	克服	get over difficulties
+put off	phr.	推迟	put off the meeting
+put up with	phr.	忍受	put up with noise
+run out of	phr.	用完	run out of time
+carry out	phr.	执行	carry out the plan
+come up with	phr.	想出	come up with an idea
+go through	phr.	经历	go through hard times
+turn down	phr.	拒绝	turn down the offer
+bring up	phr.	抚养/提出	bring up a topic
+keep up with	phr.	跟上	keep up with news
+look up	phr.	查阅	look up a word
+look after	phr.	照顾	look after the baby
+look into	phr.	调查	look into the matter
+pay attention to	phr.	注意	pay attention to details
+make use of	phr.	利用	make use of resources
+take advantage of	phr.	利用	take advantage of the chance
+catch up with	phr.	赶上	catch up with others
+break down	phr.	崩溃/分解	break down in tears
+break out	phr.	爆发	war broke out
+break up	phr.	分手/解散	break up the meeting
+call off	phr.	取消	call off the trip
+call on	phr.	拜访/号召	call on students
+deal with	phr.	处理	deal with problems
+depend on	phr.	依赖	depend on parents
+figure out	phr.	弄清楚	figure out the answer
+find out	phr.	发现	find out the truth
+give in	phr.	屈服	give in to pressure
+go ahead	phr.	继续/前进	go ahead with the plan
+hold on	phr.	等一下	hold on a minute
+keep on	phr.	继续	keep on trying
+pick up	phr.	捡起/学会	pick up English
+point out	phr.	指出	point out mistakes
+set up	phr.	建立	set up a company
+show up	phr.	出现	show up on time
+take off	phr.	起飞/脱下	the plane took off
+take over	phr.	接管	take over the company
+turn up	phr.	出现/调高	turn up the volume
+work out	phr.	锻炼/解决	work out the problem
+be used to	phr.	习惯于	be used to getting up early
+used to	phr.	过去常常	used to play football
+be fond of	phr.	喜欢	be fond of music
+be aware of	phr.	意识到	be aware of danger
+be capable of	phr.	能够	be capable of doing
+be responsible for	phr.	对…负责	be responsible for safety
+be familiar with	phr.	熟悉	be familiar with the rules
+be interested in	phr.	对…感兴趣	be interested in art
+be good at	phr.	擅长	be good at math
+be afraid of	phr.	害怕	be afraid of dogs
+be proud of	phr.	为…骄傲	be proud of success
+be different from	phr.	与…不同	be different from others
+be full of	phr.	充满	be full of energy
+be short of	phr.	缺乏	be short of money
+make a decision	phr.	做决定	make a quick decision
+make progress	phr.	取得进步	make great progress
+make sense	phr.	有意义	make sense to me
+do harm to	phr.	对…有害	do harm to health
+take action	phr.	采取行动	take immediate action
+have an effect on	phr.	对…有影响	have an effect on results
+have difficulty doing	phr.	做某事有困难	have difficulty understanding
+keep in touch with	phr.	保持联系	keep in touch with friends
+diploma	n.	文凭	college diploma
+undergraduate	n.	本科生	undergraduate student
+postgraduate	n.	研究生	postgraduate study
+tuition	n.	学费	pay tuition fees
+semester	n.	学期	this semester
+thesis	n.	论文	write a thesis
+dissertation	n.	学位论文	doctoral dissertation
+seminar	n.	研讨会	research seminar
+qualification	n.	资格	job qualification
+proficiency	n.	熟练	language proficiency
+vocabulary	n.	词汇	build vocabulary
+pronunciation	n.	发音	correct pronunciation
+fluency	n.	流利	speak with fluency
+tense	n.	时态	present tense
+subjunctive	n.	虚拟语气	subjunctive mood
+inversion	n.	倒装	partial inversion
+ellipsis	n.	省略	use ellipsis
+punctuation	n.	标点	correct punctuation
+internet	n.	互联网	surf the internet
+hardware	n.	硬件	computer hardware
+download	v.	下载	download files
+email	n./v.	电子邮件	send an email
+password	n.	密码	enter password
+browser	n.	浏览器	open a browser
+artificial	adj.	人工的	artificial intelligence
+automation	n.	自动化	factory automation
+patent	n.	专利	apply for a patent
+laboratory	n.	实验室	research laboratory
+hypothesis	n.	假设	test a hypothesis
+probability	n.	概率	high probability
+equation	n.	方程	solve an equation
+microscope	n.	显微镜	under a microscope
+telescope	n.	望远镜	powerful telescope
+rocket	n.	火箭	launch a rocket
+galaxy	n.	星系	distant galaxy
+ecology	n.	生态	protect ecology
+ecosystem	n.	生态系统	marine ecosystem
+contaminate	v.	污染	contaminate water
+recycle	v.	回收	recycle waste
+renewable	adj.	可再生的	renewable energy
+emission	n.	排放	carbon emission
+greenhouse	n.	温室	greenhouse effect
+sustainable	adj.	可持续的	sustainable development
+biodiversity	n.	生物多样性	protect biodiversity
+deforestation	n.	滥伐森林	stop deforestation
+drought	n.	干旱	severe drought
+hurricane	n.	飓风	powerful hurricane
+tsunami	n.	海啸	tsunami warning
+pandemic	n.	大流行	global pandemic
+vaccine	n.	疫苗	COVID vaccine
+diagnosis	n.	诊断	early diagnosis
+prescription	n.	处方	write a prescription
+physician	n.	内科医生	family physician
+pharmacy	n.	药房	near the pharmacy
+premium	n.	保费	pay premiums
+lawsuit	n.	诉讼	file a lawsuit
+defendant	n.	被告	the defendant pleaded
+plaintiff	n.	原告	the plaintiff claimed
+verdict	n.	裁决	guilty verdict
+amendment	n.	修正案	constitutional amendment
+republic	n.	共和国	democratic republic
+parliament	n.	议会	member of parliament
+ballot	n.	选票	secret ballot
+diplomacy	n.	外交	international diplomacy
+embassy	n.	大使馆	visit the embassy
+tariff	n.	关税	import tariff
+recession	n.	衰退	economic recession
+dividend	n.	股息	pay dividends
+bankruptcy	n.	破产	declare bankruptcy
+merger	n.	合并	company merger
+takeover	n.	收购	hostile takeover
+entrepreneur	n.	企业家	young entrepreneur
+startup	n.	初创公司	tech startup
+revenue	n.	收入	annual revenue
+surplus	n.	盈余	budget surplus
+portfolio	n.	投资组合	investment portfolio
+mortgage	n.	抵押贷款	pay the mortgage
+dawn	n.	黎明	at dawn
+deaf	adj.	聋的	go deaf
+dealer	n.	经销商	car dealer
+decay	v./n.	腐烂	tooth decay
+decent	adj.	体面的	decent job
+dedicate	v.	 dedicate	dedicate oneself to
+definite	adj.	明确的	definite answer
+delegate	n./v.	代表	send a delegate
+deliberate	adj./v.	 deliberate	deliberate action
+delight	n./v.	 delight	with delight
+dense	adj.	密集的	dense population
+dental	adj.	牙科的	dental care
+depart	v.	 depart	depart from
+deputy	n.	副手	deputy manager
+descend	v.	 descend	descend the stairs
+designer	n.	设计师	fashion designer
+desirable	adj.	 desirable	highly desirable
+desperate	adj.	 desperate	desperate situation
+despite	prep.	 despite	despite difficulties
+diameter	n.	 diameter	circle diameter
+diary	n.	 diary	keep a diary
+dictate	v.	 dictate	dictate terms
+digest	v./n.	 digest	digest food
+dilemma	n.	 dilemma	face a dilemma
+directory	n.	 directory	phone directory
+dirt	n.	 dirt	covered in dirt
+disagree	v.	 disagree	disagree with
+disappoint	v.	 disappoint	disappoint fans
+disc	n.	 disc	compact disc
+discourage	v.	 discourage	discourage smoking
+disguise	v./n.	 disguise	in disguise
+disgust	n./v.	 disgust	with disgust
+dish	n.	 dish	main dish
+disk	n.	 disk	hard disk
+disposal	n.	 disposal	waste disposal
+distinct	adj.	 distinct	distinct features
+distress	n./v.	 distress	in distress
+dive	v./n.	 dive	dive into water
+diversity	n.	 diversity	cultural diversity
+divorce	n./v.	 divorce	get a divorce
+dizzy	adj.	 dizzy	feel dizzy
+dominant	adj.	 dominant	dominant position
+donation	n.	 donation	charitable donation
+donkey	n.	 donkey	ride a donkey
+dorm	n.	 dorm	college dorm
+dot	n.	 dot	polka dot
+down	adv./prep.	 down	sit down
+downstairs	adv.	 downstairs	go downstairs
+dozen	n.	 dozen	a dozen eggs
+dragon	n.	 dragon	Chinese dragon
+drill	n./v.	 drill	fire drill
+drip	v./n.	 drip	drip water
+drum	n.	 drum	beat the drum
+drunk	adj.	 drunk	get drunk
+duck	n.	 duck	roast duck
+dumb	adj.	 dumb	dumb question
+durable	adj.	 durable	durable goods
+duration	n.	 duration	for the duration
+during	prep.	 during	during the war
+dust	n.	 dust	covered with dust
+each	pron./adj.	 each	each other
+eagle	n.	 eagle	golden eagle
+ear	n.	 ear	ear infection
+earnest	adj.	 earnest	earnest effort
+east	n./adj.	 east	Middle East
+echo	n./v.	 echo	echo sound
+economical	adj.	 economical	economical car
+economics	n.	 economics	study economics
+eight	num.	 eight	eight people
+eighteen	num.	 eighteen	eighteen years
+eighty	num.	 eighty	eighty percent
+elder	adj./n.	 elder	elder brother
+electrical	adj.	 electrical	electrical engineer
+elevator	n.	 elevator	take the elevator
+eleven	num.	 eleven	eleven o'clock
+else	adv.	 else	anything else
+elsewhere	adv.	 elsewhere	look elsewhere
+emperor	n.	 emperor	Roman emperor
+emphasize	v.	 emphasize	emphasize importance
+ending	n.	 ending	happy ending
+enough	adj./adv.	 enough	good enough
+enthusiastic	adj.	 enthusiastic	enthusiastic supporter
+envelope	n.	 envelope	sealed envelope
+era	n.	 era	modern era
+establishment	n.	 establishment	business establishment
+etc	abbr.	 等等	and etc.
+eternal	adj.	 eternal	eternal love
+eve	n.	 eve	Christmas eve
+evening	n.	 evening	good evening
+everybody	pron.	 everybody	everybody knows
+everyday	adj.	 everyday	everyday life
+everyone	pron.	 everyone	everyone agrees
+everything	pron.	 everything	everything is fine
+everywhere	adv.	 everywhere	look everywhere
+evil	n./adj.	 evil	fight evil
+exceptional	adj.	 exceptional	exceptional talent
+excess	n./adj.	 excess	in excess of
+excessive	adj.	 excessive	excessive spending
+exclaim	v.	 exclaim	exclaim in surprise
+exclude	v.	 exclude	exclude from
+exert	v.	 exert	exert influence
+exhaust	v./n.	 exhaust	feel exhausted
+exploit	v./n.	 exploit	exploit resources
+extraordinary	adj.	 extraordinary	extraordinary achievement
+fabric	n.	织物	cotton fabric
+facility	n.	设施	sports facility
+faint	adj./v.	 faint	faint voice
+faithful	adj.	忠诚的	faithful friend
+fake	adj./n.	假的/假货	fake product
+famine	n.	饥荒	severe famine
+fantastic	adj.	极好的	fantastic idea
+fantasy	n.	幻想	live in fantasy
+fascinate	v.	迷住	fascinate the audience
+fat	n./adj.	 fat	too much fat
+fate	n.	命运	accept fate
+father	n.	父亲	my father
+feast	n.	盛宴	wedding feast
+feather	n.	羽毛	bird feather
+fence	n.	栅栏	wooden fence
+fertile	adj.	肥沃的	fertile soil
+festival	n.	节日	Spring Festival
+fever	n.	发烧	have a fever
+fiber	n.	纤维	dietary fiber
+fiction	n.	小说	science fiction
+fist	n.	拳头	clench fist
+fleet	n.	舰队	naval fleet
+flesh	n.	 flesh	in the flesh
+flock	n./v.	 flock	a flock of birds
+flour	n.	 flour	wheat flour
+flu	n.	流感	catch the flu
+fluent	adj.	 fluent	fluent English
+fluid	n./adj.	 fluid	body fluid
+fog	n.	 fog	thick fog
+folk	n./adj.	 folk	folk music
+following	adj./n.	 following	the following day
+fond	adj.	 fond	be fond of
+fool	n./v.	 fool	make a fool of

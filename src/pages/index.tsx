@@ -670,6 +670,15 @@ export default function GrammarHome() {
               type="primary"
               className="sideActionButton"
               onClick={() => {
+                goToRoute("/degree-exam");
+              }}
+            >
+              学位英语备考知识库
+            </Button>
+            <Button
+              type="primary"
+              className="sideActionButton"
+              onClick={() => {
                 goToRoute("/remaining");
               }}
             >

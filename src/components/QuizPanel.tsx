@@ -9,7 +9,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
-import { quizPapers } from "@/data/quizPapers";
+import { quizPapers, type QuizPaper } from "@/data/quizPapers";
 
 const STORAGE_PREFIX = "english-quiz";
 
@@ -37,7 +37,19 @@ function normalizeState(raw: unknown): QuizState {
   };
 }
 
-export function QuizPanel({ pageKey = "grammar" }: { pageKey?: string }) {
+export function QuizPanel({
+  pageKey = "grammar",
+  papers = quizPapers,
+  triggerLabel = "试卷",
+  cardTitle = "巩固测验",
+  cardSubtitle = "覆盖知识点 1-36，选一份开始",
+}: {
+  pageKey?: string;
+  papers?: QuizPaper[];
+  triggerLabel?: string;
+  cardTitle?: string;
+  cardSubtitle?: string;
+}) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
   const [activePaperId, setActivePaperId] = React.useState<string | null>(null);
@@ -88,8 +100,8 @@ export function QuizPanel({ pageKey = "grammar" }: { pageKey?: string }) {
   }, [open]);
 
   const activePaper = React.useMemo(
-    () => quizPapers.find((paper) => paper.id === activePaperId) ?? null,
-    [activePaperId],
+    () => papers.find((paper) => paper.id === activePaperId) ?? null,
+    [activePaperId, papers],
   );
 
   const getPaperAnswers = React.useCallback(
@@ -99,7 +111,7 @@ export function QuizPanel({ pageKey = "grammar" }: { pageKey?: string }) {
 
   const getPaperProgress = React.useCallback(
     (paperId: string) => {
-      const paper = quizPapers.find((item) => item.id === paperId);
+      const paper = papers.find((item) => item.id === paperId);
       if (!paper) return { done: 0, total: 0 };
       const answers = state.answers[paperId] ?? {};
       const done = paper.questions.filter(
@@ -112,7 +124,7 @@ export function QuizPanel({ pageKey = "grammar" }: { pageKey?: string }) {
 
   const getPaperScore = React.useCallback(
     (paperId: string) => {
-      const paper = quizPapers.find((item) => item.id === paperId);
+      const paper = papers.find((item) => item.id === paperId);
       if (!paper) return { correct: 0, total: 0 };
       const answers = state.answers[paperId] ?? {};
       const correct = paper.questions.filter(
@@ -182,18 +194,16 @@ export function QuizPanel({ pageKey = "grammar" }: { pageKey?: string }) {
         <span className="quizTriggerIcon">
           <FileText size={16} />
         </span>
-        <span className="quizTriggerLabel">试卷</span>
-        <span className="quizTriggerCount">{quizPapers.length}</span>
+        <span className="quizTriggerLabel">{triggerLabel}</span>
+        <span className="quizTriggerCount">{papers.length}</span>
       </button>
 
       {open ? (
         <div className="quizCard" role="dialog" aria-label="选择试卷">
           <div className="quizCardHeader">
             <div className="quizCardHeaderMain">
-              <span className="quizCardTitle">巩固测验</span>
-              <span className="quizCardSubtitle">
-                覆盖知识点 1-36，选一份开始
-              </span>
+              <span className="quizCardTitle">{cardTitle}</span>
+              <span className="quizCardSubtitle">{cardSubtitle}</span>
             </div>
             <button
               type="button"
@@ -206,7 +216,7 @@ export function QuizPanel({ pageKey = "grammar" }: { pageKey?: string }) {
           </div>
 
           <div className="quizPaperList">
-            {quizPapers.map((paper) => {
+            {papers.map((paper) => {
               const progress = getPaperProgress(paper.id);
               const graded = !!state.graded[paper.id];
               const score = getPaperScore(paper.id);

@@ -17,6 +17,8 @@ import type { ColumnsType } from "antd/es/table";
 import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
 import { HotTopicsPanel } from "@/components/HotTopicsPanel";
+import { QuizPanel } from "@/components/QuizPanel";
+import { degreeExamQuizPapers } from "@/data/degreeExamQuizPapers";
 import { StudyCountTag } from "@/components/StudyCountTag";
 import {
   StudyCelebration,
@@ -38,7 +40,11 @@ import {
 import { useStableAnchorScroll } from "@/hooks/useStableAnchorScroll";
 import { encouragementQuotes } from "@/data/encouragementQuotes";
 import type { GrammarTopic } from "@/data/grammarTopics";
-import { remainingKnowledgeTopics } from "@/data/remainingKnowledgeTopics";
+import {
+  degreeExamPracticeTopics,
+  degreeExamVocabTopics,
+} from "@/data/degreeExamTopics";
+import { degreeExamVocabWordTopics } from "@/data/degreeExamVocabWordTopics";
 import "./index.less";
 
 const { Sider, Content } = Layout;
@@ -55,100 +61,34 @@ const levelColor: Record<GrammarTopic["level"], string> = {
   易错: "volcano",
 };
 
-const remainingLearningStages = [
+const degreeExamStages = [
   {
-    id: "remaining-stage-sound-spelling",
-    title: "第一阶段：语音听辨和拼写底层",
+    id: "degree-stage-vocab",
+    title: "第二块：高频词与固定搭配",
     description:
-      "先听出音素，再把声音和拼写、大小写、标点连起来，最后进入整句重音、节奏和连读。",
-    topicIds: [
-      "phonemic-awareness",
-      "spelling-system",
-      "punctuation-mechanics",
-      "pronunciation-prosody",
-    ],
+      "每天 20–30 个 3500 高频词滚动复习；重点攻克动词短语、介词 to 陷阱、make/do/take 搭配和近义辨析——完形和单选 70% 的词汇分在这里。",
+    topics: degreeExamVocabTopics,
   },
   {
-    id: "remaining-stage-vocabulary-word-formation",
-    title: "第二阶段：词汇网络和词法",
+    id: "degree-stage-wordlist",
+    title: "第二块续：3500 高频词分组词表",
     description:
-      "先建立高频词、主题词和工具书习惯，再学习词根词缀、搭配、语域和习语。",
-    topicIds: [
-      "vocabulary-system",
-      "reference-tools",
-      "morphology",
-      "vocabulary-depth",
-    ],
+      "按 Unit 1 起每天 30 词背诵，117 个 Unit 覆盖 3500+ 高频词。每词含释义和例句/搭配，背完一组在目录标「掌握」。",
+    topics: degreeExamVocabWordTopics,
   },
   {
-    id: "remaining-stage-reading",
-    title: "第三阶段：阅读策略和文本理解",
+    id: "degree-stage-practice",
+    title: "第三块：真题专项与写作模板",
     description:
-      "先保证读得准、读得顺，再学习略读、扫读、精读、主旨细节、文章结构和非虚构阅读。",
-    topicIds: [
-      "reading-foundations",
-      "reading-strategies",
-      "reading-comprehension",
-      "text-structures",
-      "nonfiction-reading",
-    ],
+      "语法刷非谓语、定语从句、时态；阅读每天 2 篇练定位；作文背书信和议论文模板，把定语从句、分词定语写进卷面。",
+    topics: degreeExamPracticeTopics,
   },
-  {
-    id: "remaining-stage-writing",
-    title: "第四阶段：写作表达系统",
-    description:
-      "先写正确句子和清楚段落，再学构思修改、不同体裁、篇章组织、语篇衔接和论证说服。",
-    topicIds: [
-      "writing-sentences",
-      "paragraph-writing",
-      "writing-process",
-      "writing-genres",
-      "discourse-cohesion",
-      "essay-writing",
-      "argument-rhetoric",
-    ],
-  },
-  {
-    id: "remaining-stage-speaking-listening",
-    title: "第五阶段：听说交流和展示",
-    description: "听懂不同材料，能对话、接话、自我修正，并完成有组织的展示。",
-    topicIds: [
-      "listening-text-types",
-      "speaking-listening",
-      "oral-fluency",
-      "presentation-skills",
-    ],
-  },
-  {
-    id: "remaining-stage-real-communication",
-    title: "第六阶段：真实语境和跨文化表达",
-    description:
-      "先理解词义、句义和上下文，再学习不同场景怎么说、怎么保持礼貌并避免文化误解。",
-    topicIds: ["semantics", "pragmatics", "cross-cultural-communication"],
-  },
-  {
-    id: "remaining-stage-literature",
-    title: "第七阶段：文学、修辞、诗歌和戏剧",
-    description: "在通用读写听说稳定后，进一步理解故事、主题、修辞和体裁表达。",
-    topicIds: ["literature", "figurative-language", "poetry-drama-genre"],
-  },
-  {
-    id: "remaining-stage-academic-digital",
-    title: "第八阶段：学术研究和数字素养",
-    description: "进入正式表达、学科英语、资料研究、信息判断和多模态阅读。",
-    topicIds: [
-      "academic-english",
-      "academic-data-language",
-      "research-literacy",
-      "media-digital-literacy",
-    ],
-  },
-  {
-    id: "remaining-stage-study-strategies",
-    title: "第九阶段：考试策略和复盘能力",
-    description: "用审题、定位、排除、错题归因和复盘计划稳定发挥语言能力。",
-    topicIds: ["test-study-strategies"],
-  },
+];
+
+const allDegreeExamTopics = [
+  ...degreeExamVocabTopics,
+  ...degreeExamVocabWordTopics,
+  ...degreeExamPracticeTopics,
 ];
 
 type GetAnnotations = ReturnType<typeof useStudyAnnotations>["getAnnotations"];
@@ -169,7 +109,7 @@ function buildColumns(
     title: column,
     dataIndex: `col${index}`,
     key: `col${index}`,
-    width: index === 0 ? 180 : undefined,
+    width: index === 0 ? 160 : undefined,
     render: (value: string, record) => (
       <span className="cellText">
         <MarkableText
@@ -266,7 +206,7 @@ function TopicCard({
             className="tips"
             type={topic.level === "易错" ? "warning" : "info"}
             showIcon
-            message="学习提醒"
+            message="考试提醒"
             description={
               <ul>
                 {topic.tips.map((tip, tipIndex) => (
@@ -289,12 +229,12 @@ function TopicCard({
   );
 }
 
-export default function RemainingKnowledgePage() {
+export default function DegreeExamPage() {
   const goToRoute = React.useCallback((path: string) => {
     window.location.hash = path;
   }, []);
-  const annotations = useStudyAnnotations("remaining");
-  const progress = useStudyProgress("remaining");
+  const annotations = useStudyAnnotations("degree-exam");
+  const progress = useStudyProgress("degree-exam");
   const celebration = useStudyCelebration();
   const handleAnchorClick = useStableAnchorScroll();
   const encouragement = React.useMemo(
@@ -304,51 +244,17 @@ export default function RemainingKnowledgePage() {
       ],
     [],
   );
-  const stagedTopics = React.useMemo(() => {
-    const topicMap = new Map(
-      remainingKnowledgeTopics.map((topic) => [topic.id, topic]),
-    );
-    const usedTopicIds = new Set<string>();
-    const stages = remainingLearningStages
-      .map((stage) => {
-        const topics = stage.topicIds
-          .map((id) => topicMap.get(id))
-          .filter((topic): topic is GrammarTopic => Boolean(topic));
-        topics.forEach((topic) => usedTopicIds.add(topic.id));
-        return { ...stage, topics };
-      })
-      .filter((stage) => stage.topics.length > 0);
-
-    const extraTopics = remainingKnowledgeTopics.filter(
-      (topic) => !usedTopicIds.has(topic.id),
-    );
-    if (extraTopics.length > 0) {
-      stages.push({
-        id: "remaining-stage-extra",
-        title: "补充阶段：综合能力补充",
-        description: "保留未归入主线的补充能力，确保知识点不遗漏。",
-        topicIds: extraTopics.map((topic) => topic.id),
-        topics: extraTopics,
-      });
-    }
-
-    return stages;
-  }, []);
-  const orderedTopics = React.useMemo(
-    () => stagedTopics.flatMap((stage) => stage.topics),
-    [stagedTopics],
-  );
   const noteCountByTopicId = React.useMemo(
     () =>
       buildAnnotationNoteCountMap(
-        orderedTopics.map((topic) => topic.id),
+        allDegreeExamTopics.map((topic) => topic.id),
         annotations.annotations,
       ),
-    [annotations.annotations, orderedTopics],
+    [annotations.annotations],
   );
   const hotTopicItems = React.useMemo(
     () =>
-      orderedTopics.map((topic, index) => ({
+      allDegreeExamTopics.map((topic, index) => ({
         id: topic.id,
         title: topic.title,
         category: topic.category,
@@ -360,18 +266,17 @@ export default function RemainingKnowledgePage() {
       })),
     [
       noteCountByTopicId,
-      orderedTopics,
       progress,
       progress.masteredIds,
       progress.studyCounts,
     ],
   );
-  const masteredCount = orderedTopics.filter((topic) =>
+  const masteredCount = allDegreeExamTopics.filter((topic) =>
     progress.isMastered(topic.id),
   ).length;
   const masteryPercent =
-    orderedTopics.length > 0
-      ? Math.round((masteredCount / orderedTopics.length) * 100)
+    allDegreeExamTopics.length > 0
+      ? Math.round((masteredCount / allDegreeExamTopics.length) * 100)
       : 0;
   const handleToggleTopicMastered = (topic: GrammarTopic) => {
     const alreadyMastered = progress.isMastered(topic.id);
@@ -380,26 +285,26 @@ export default function RemainingKnowledgePage() {
       celebration.celebrate(
         topic.title,
         masteredCount + 1,
-        orderedTopics.length,
+        allDegreeExamTopics.length,
       );
     }
   };
-  const anchorItems = stagedTopics.map((stage, stageIndex) => {
-    const allMastered = stage.topics.every((topic) =>
-      progress.isMastered(topic.id),
-    );
+  const anchorItems = degreeExamStages.map((stage, stageIndex) => {
+    const topicOffset = degreeExamStages
+      .slice(0, stageIndex)
+      .reduce((sum, item) => sum + item.topics.length, 0);
+    const blockNumber = stageIndex <= 1 ? 2 : 3;
     return {
       key: stage.id,
       href: `#${stage.id}`,
-      title: tocTitle(
-        `${stageIndex + 1}. ${stage.title.replace(/^第.+?阶段：/, "")}`,
-        allMastered,
-      ),
+      title: stage.title.replace(/^第.+?块(续)?：/, ""),
       children: stage.topics.map((topic, topicIndex) => ({
         key: topic.id,
         href: `#${topic.id}`,
         title: tocTitle(
-          `${stageIndex + 1}.${topicIndex + 1} ${topic.title}`,
+          topic.id.startsWith("degree-vocab-unit-")
+            ? topic.title
+            : `${blockNumber}.${topicOffset + topicIndex + 1} ${topic.title}`,
           progress.isMastered(topic.id),
         ),
       })),
@@ -435,7 +340,7 @@ export default function RemainingKnowledgePage() {
             <div className="tocPanel">
               <div className="tocHead">
                 <MapPinned size={18} />
-                <Text strong>剩余知识点目录</Text>
+                <Text strong>学位英语考点目录</Text>
               </div>
               <div className="tocProgress">
                 <div className="tocProgressMeta">
@@ -449,7 +354,7 @@ export default function RemainingKnowledgePage() {
                   />
                 </div>
                 <div className="tocProgressCount">
-                  已掌握 {masteredCount} / {orderedTopics.length}
+                  已掌握 {masteredCount} / {allDegreeExamTopics.length}
                 </div>
               </div>
               <div className="tocScroll">
@@ -468,30 +373,30 @@ export default function RemainingKnowledgePage() {
             <header className="hero">
               <div className="heroBadge">
                 <GraduationCap size={18} />
-                <span>完整英语能力 · Grammar 之外</span>
+                <span>成人本科学位英语 · 备考专项</span>
               </div>
-              <Title className="heroTitle">英语剩余知识点系统</Title>
+              <Title className="heroTitle">学位英语备考知识库</Title>
               <Paragraph className="heroText">
                 <MarkableText
-                  id="remaining-hero-text"
-                  text="本课程系统补齐语法之外的完整英语能力：语音听辨、拼写书写、发音韵律、词汇网络、词法构词、阅读策略、写作表达、听说交流、语义语用、跨文化交际、文学修辞、学术英语、研究能力、考试策略和数字素养。它不是重复语法，而是把英语从“会做题”提升到“会阅读、会表达、会交流、会研究”的综合能力系统。"
+                  id="degree-exam-hero-text"
+                  text="本页专攻学位英语卷面得分点：第二块系统整理 3500 高频词背诵法、动词短语、介词陷阱、名词搭配和近义辨析；第三块覆盖非谓语、定语从句、时态等语法真题考点，阅读理解定位四步法，完形解题流程，以及书信和议论文写作模板。建议配合《英语语法知识库》系统学习后，用本页内容刷真题、对错题、背模板。"
                   annotations={annotations.getAnnotations(
-                    "remaining-hero-text",
+                    "degree-exam-hero-text",
                   )}
                 />
               </Paragraph>
               <div className="heroStats">
                 <div>
-                  <strong>{orderedTopics.length}</strong>
-                  <span>知识点</span>
+                  <strong>{allDegreeExamTopics.length}</strong>
+                  <span>考点模块</span>
                 </div>
                 <div>
                   <strong>{masteryPercent}%</strong>
                   <span>掌握进度</span>
                 </div>
                 <div>
-                  <strong>系统</strong>
-                  <span>综合能力</span>
+                  <strong>真题</strong>
+                  <span>导向备考</span>
                 </div>
               </div>
             </header>
@@ -500,21 +405,26 @@ export default function RemainingKnowledgePage() {
               <BookOpen size={20} />
               <span>
                 <MarkableText
-                  id="remaining-route"
-                  text="学习路线：建议先完成《自然拼读系统知识库》和《英语语法知识库》再学习本页。先用音素听辨、拼写和书写规范打底，再建立词汇网络、工具书习惯和词法构词能力；接着进入阅读策略、写作表达、听说展示和真实语境沟通；在通用能力稳定后再做文学修辞体裁；最后提升到学术研究、数字素养、考试策略和复盘能力。全部掌握后，你会不只是“懂语法”，而是能更自信地读英文材料、写清楚观点、听懂真实表达、开口沟通，并逐步具备用英语学习新知识的能力。"
-                  annotations={annotations.getAnnotations("remaining-route")}
+                  id="degree-exam-route"
+                  text="备考路线：第一块在《英语语法知识库》系统学语法；第二块在本页背高频词和固定搭配，每天 20–30 词 + 滚动复习；第三块按非谓语→定语从句→时态→阅读定位→完形→写作模板顺序刷真题，错题回到对应考点标掌握。写作至少背熟 4 种书信 + 3 种议论文骨架，考场上直接套定语从句和分词句提分。"
+                  annotations={annotations.getAnnotations("degree-exam-route")}
                 />
               </span>
             </div>
 
-            {stagedTopics.map((stage, stageIndex) => (
+            {degreeExamStages.map((stage, stageIndex) => {
+              const topicOffset = degreeExamStages
+                .slice(0, stageIndex)
+                .reduce((sum, item) => sum + item.topics.length, 0);
+              const blockNumber = stageIndex <= 1 ? 2 : 3;
+              return (
               <section key={stage.id} id={stage.id} className="stageSection">
                 <Card className="stageCard">
                   <div className="stageNumber">
-                    阶段 {String(stageIndex + 1).padStart(2, "0")}
+                    第 {blockNumber} 块{stageIndex === 1 ? " · 词表" : ""}
                   </div>
                   <Title level={2} className="stageTitle">
-                    {stage.title}
+                    {stage.title.replace(/^第.+?块(续)?：/, "")}
                   </Title>
                   <Paragraph className="stageDescription">
                     {stage.description}
@@ -524,7 +434,11 @@ export default function RemainingKnowledgePage() {
                   <TopicCard
                     key={topic.id}
                     topic={topic}
-                    number={`${stageIndex + 1}.${topicIndex + 1}`}
+                    number={
+                      topic.id.startsWith("degree-vocab-unit-")
+                        ? topic.title.match(/^Unit \d+/)?.[0] || ""
+                        : `${blockNumber}.${topicOffset + topicIndex + 1}`
+                    }
                     getAnnotations={annotations.getAnnotations}
                     mastered={progress.isMastered(topic.id)}
                     studyCount={progress.getStudyCount(topic.id)}
@@ -541,7 +455,8 @@ export default function RemainingKnowledgePage() {
                   />
                 ))}
               </section>
-            ))}
+              );
+            })}
           </Content>
 
           <aside className="encouragementRail" aria-label="学习鼓励语">
@@ -564,17 +479,9 @@ export default function RemainingKnowledgePage() {
             </div>
           </aside>
 
-          <aside className="sideActionRail" aria-label="返回语法入口">
+          <aside className="sideActionRail" aria-label="返回其他知识库">
             <Button
               type="primary"
-              className="sideActionButton"
-              onClick={() => {
-                goToRoute("/degree-exam");
-              }}
-            >
-              学位英语备考知识库
-            </Button>
-            <Button
               className="sideActionButton"
               onClick={() => {
                 goToRoute("/");
@@ -585,10 +492,10 @@ export default function RemainingKnowledgePage() {
             <Button
               className="sideActionButton"
               onClick={() => {
-                goToRoute("/phonics");
+                goToRoute("/remaining");
               }}
             >
-              查看自然拼读系统知识库
+              查看剩余英语能力知识点
             </Button>
           </aside>
 
@@ -600,8 +507,15 @@ export default function RemainingKnowledgePage() {
             clearAll={annotations.clearAll}
           />
           <StudyCelebration celebration={celebration.celebration} />
-          <HotTopicsPanel pageKey="remaining" items={hotTopicItems} />
-          <DataBackupWidget variant="noQuiz" />
+          <HotTopicsPanel pageKey="degree-exam" items={hotTopicItems} />
+          <QuizPanel
+            pageKey="degree-exam"
+            papers={degreeExamQuizPapers}
+            triggerLabel="真题练习"
+            cardTitle="学位英语真题练习"
+            cardSubtitle="动词短语、搭配、语法、完形、阅读，共 8 套卷"
+          />
+          <DataBackupWidget />
           <DoubaoChatWidget />
           <FloatButton.BackTop />
         </Layout>

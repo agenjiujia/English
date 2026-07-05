@@ -958,6 +958,15 @@ export default function PhonicsPage() {
 
           <aside className="sideActionRail" aria-label="返回语法入口">
             <Button
+              type="primary"
+              className="sideActionButton"
+              onClick={() => {
+                goToRoute("/degree-exam");
+              }}
+            >
+              学位英语备考知识库
+            </Button>
+            <Button
               className="sideActionButton"
               onClick={() => {
                 goToRoute("/");

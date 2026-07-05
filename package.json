@@ -11,7 +11,8 @@
     "grade": "$(npm run -s _py) .cursor/skills/english-review/scripts/review.py grade",
     "dev": "umi dev",
     "build": "umi build",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "vocab:build": "node scripts/vocab/generate-all.mjs && node scripts/seed-vocab.mjs && node scripts/build-degree-vocab.mjs"
   },
   "dependencies": {
     "@umijs/max": "^4.4.12",

@@ -21,6 +21,10 @@ export default defineConfig({
       path: "/phonics",
       component: "@/pages/phonics",
     },
+    {
+      path: "/degree-exam",
+      component: "@/pages/degree-exam",
+    },
   ],
   mfsu: false,
   title: "英语系统知识库",
