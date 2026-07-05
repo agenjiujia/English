@@ -1924,7 +1924,7 @@ export const grammarTopics: GrammarTopic[] = [
     "过去式和过去分词既有规则变化，也有必须背的不规则变化。",
     [
       ["规则", "play", "played / played", "加 ed"],
-      ["规则", "study", "studied / studied", "变 y 为 ied"],
+      ["规则", "study", "studied / studied", "辅音+y，变 y 为 ied"],
       ["不规则", "go", "went / gone", "特殊记忆"],
       ["不规则", "eat", "ate / eaten", "特殊记忆"],
       ["不规则", "see", "saw / seen", "特殊记忆"],
