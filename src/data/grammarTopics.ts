@@ -1928,6 +1928,7 @@ export const grammarTopics: GrammarTopic[] = [
       ["不规则", "go", "went / gone", "特殊记忆"],
       ["不规则", "eat", "ate / eaten", "特殊记忆"],
       ["不规则", "see", "saw / seen", "特殊记忆"],
+      ["不规则", "break", "broke / broken", "特殊记忆"],
     ],
     ["did 后用原形；完成时用过去分词。"],
   ),
