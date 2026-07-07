@@ -14,8 +14,12 @@ import {
   Typography,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { BookOpen, GraduationCap, MapPinned } from "lucide-react";
+import { BookOpen, GraduationCap, MapPinned, Star } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
+import {
+  WordMasteryProgress,
+  type WordUnitProgress,
+} from "@/components/WordMasteryProgress";
 import { HotTopicsPanel } from "@/components/HotTopicsPanel";
 import { QuizPanel } from "@/components/QuizPanel";
 import { degreeExamQuizPapers } from "@/data/degreeExamQuizPapers";
@@ -101,24 +105,59 @@ function tocTitle(text: string, mastered: boolean) {
   );
 }
 
+type WordMasteryControls = {
+  isMastered: (wordId: string) => boolean;
+  toggle: (wordId: string) => void;
+};
+
+function wordIdFor(topicId: string, rowIndex: number) {
+  return `${topicId}-w${rowIndex}`;
+}
+
 function buildColumns(
   topic: GrammarTopic,
   getAnnotations: GetAnnotations,
+  wordMastery?: WordMasteryControls,
 ): ColumnsType<TopicRow> {
+  const isWordTopic = topic.id.startsWith("degree-vocab-unit-");
   return topic.columns.map((column, index) => ({
     title: column,
     dataIndex: `col${index}`,
     key: `col${index}`,
     width: index === 0 ? 160 : undefined,
-    render: (value: string, record) => (
-      <span className="cellText">
-        <MarkableText
-          id={`${record.key}-col${index}`}
-          text={value}
-          annotations={getAnnotations(`${record.key}-col${index}`)}
-        />
-      </span>
-    ),
+    render: (value: string, record) => {
+      const cell = (
+        <span className="cellText">
+          <MarkableText
+            id={`${record.key}-col${index}`}
+            text={value}
+            annotations={getAnnotations(`${record.key}-col${index}`)}
+          />
+        </span>
+      );
+      if (!isWordTopic || index !== 1 || !wordMastery) return cell;
+      const rowIndex = Number(record.key.slice(`${topic.id}-`.length));
+      const wordId = wordIdFor(topic.id, rowIndex);
+      const mastered = wordMastery.isMastered(wordId);
+      return (
+        <span className="wordCell">
+          {cell}
+          <button
+            type="button"
+            className={mastered ? "wordStar wordStarActive" : "wordStar"}
+            aria-label={mastered ? "取消掌握该词" : "标记掌握该词"}
+            aria-pressed={mastered}
+            title={mastered ? "已掌握（点击取消）" : "标记掌握"}
+            onClick={(event) => {
+              event.stopPropagation();
+              wordMastery.toggle(wordId);
+            }}
+          >
+            <Star size={15} fill={mastered ? "currentColor" : "none"} />
+          </button>
+        </span>
+      );
+    },
   }));
 }
 
@@ -138,6 +177,8 @@ function TopicCard({
   getAnnotations,
   mastered,
   studyCount,
+  wordMastery,
+  wordMasteredInUnit,
   onToggleMastered,
   onIncrementStudyCount,
   onDecrementStudyCount,
@@ -148,11 +189,14 @@ function TopicCard({
   getAnnotations: GetAnnotations;
   mastered: boolean;
   studyCount: number;
+  wordMastery?: WordMasteryControls;
+  wordMasteredInUnit?: number;
   onToggleMastered: () => void;
   onIncrementStudyCount: () => void;
   onDecrementStudyCount: () => void;
   onSetStudyCount: (count: number) => void;
 }) {
+  const isWordTopic = topic.id.startsWith("degree-vocab-unit-");
   return (
     <section id={topic.id} className="topicSection">
       <LazyMount
@@ -166,6 +210,11 @@ function TopicCard({
               <span>{topic.title}</span>
               <Tag color={levelColor[topic.level]}>{topic.level}</Tag>
               <Tag className="categoryTag">{topic.category}</Tag>
+              {isWordTopic ? (
+                <Tag className="wordMasteredTag">
+                  已掌握 {wordMasteredInUnit ?? 0}/{topic.rows.length}
+                </Tag>
+              ) : null}
             </Space>
           }
           extra={
@@ -195,7 +244,7 @@ function TopicCard({
           </Paragraph>
           <Table<TopicRow>
             className="knowledgeTable"
-            columns={buildColumns(topic, getAnnotations)}
+            columns={buildColumns(topic, getAnnotations, wordMastery)}
             dataSource={buildRows(topic)}
             pagination={false}
             size="middle"
@@ -235,6 +284,7 @@ export default function DegreeExamPage() {
   }, []);
   const annotations = useStudyAnnotations("degree-exam");
   const progress = useStudyProgress("degree-exam");
+  const wordProgress = useStudyProgress("degree-exam-words");
   const celebration = useStudyCelebration();
   const handleAnchorClick = useStableAnchorScroll();
   const encouragement = React.useMemo(
@@ -264,12 +314,7 @@ export default function DegreeExamPage() {
         order: index,
         onOpen: () => scrollToElementById(topic.id),
       })),
-    [
-      noteCountByTopicId,
-      progress,
-      progress.masteredIds,
-      progress.studyCounts,
-    ],
+    [noteCountByTopicId, progress, progress.masteredIds, progress.studyCounts],
   );
   const masteredCount = allDegreeExamTopics.filter((topic) =>
     progress.isMastered(topic.id),
@@ -278,6 +323,50 @@ export default function DegreeExamPage() {
     allDegreeExamTopics.length > 0
       ? Math.round((masteredCount / allDegreeExamTopics.length) * 100)
       : 0;
+
+  const wordMasteryControls = React.useMemo<WordMasteryControls>(
+    () => ({
+      isMastered: (wordId: string) => wordProgress.isMastered(wordId),
+      toggle: (wordId: string) => wordProgress.toggleMastered(wordId),
+    }),
+    [wordProgress],
+  );
+  const wordUnitProgress = React.useMemo<WordUnitProgress[]>(
+    () =>
+      degreeExamVocabWordTopics.map((topic) => ({
+        id: topic.id,
+        title: topic.title.replace(/：.*$/, ""),
+        total: topic.rows.length,
+        mastered: topic.rows.reduce(
+          (sum, _row, rowIndex) =>
+            wordProgress.isMastered(wordIdFor(topic.id, rowIndex))
+              ? sum + 1
+              : sum,
+          0,
+        ),
+      })),
+    [wordProgress],
+  );
+  const wordTotalCount = React.useMemo(
+    () =>
+      degreeExamVocabWordTopics.reduce(
+        (sum, topic) => sum + topic.rows.length,
+        0,
+      ),
+    [],
+  );
+  const wordMasteredCount = wordUnitProgress.reduce(
+    (sum, unit) => sum + unit.mastered,
+    0,
+  );
+  const wordMasteredByTopicId = React.useMemo(
+    () =>
+      Object.fromEntries(
+        wordUnitProgress.map((unit) => [unit.id, unit.mastered]),
+      ) as Record<string, number>,
+    [wordUnitProgress],
+  );
+
   const handleToggleTopicMastered = (topic: GrammarTopic) => {
     const alreadyMastered = progress.isMastered(topic.id);
     progress.toggleMastered(topic.id);
@@ -418,43 +507,49 @@ export default function DegreeExamPage() {
                 .reduce((sum, item) => sum + item.topics.length, 0);
               const blockNumber = stageIndex <= 1 ? 2 : 3;
               return (
-              <section key={stage.id} id={stage.id} className="stageSection">
-                <Card className="stageCard">
-                  <div className="stageNumber">
-                    第 {blockNumber} 块{stageIndex === 1 ? " · 词表" : ""}
-                  </div>
-                  <Title level={2} className="stageTitle">
-                    {stage.title.replace(/^第.+?块(续)?：/, "")}
-                  </Title>
-                  <Paragraph className="stageDescription">
-                    {stage.description}
-                  </Paragraph>
-                </Card>
-                {stage.topics.map((topic, topicIndex) => (
-                  <TopicCard
-                    key={topic.id}
-                    topic={topic}
-                    number={
-                      topic.id.startsWith("degree-vocab-unit-")
-                        ? topic.title.match(/^Unit \d+/)?.[0] || ""
-                        : `${blockNumber}.${topicOffset + topicIndex + 1}`
-                    }
-                    getAnnotations={annotations.getAnnotations}
-                    mastered={progress.isMastered(topic.id)}
-                    studyCount={progress.getStudyCount(topic.id)}
-                    onToggleMastered={() => handleToggleTopicMastered(topic)}
-                    onIncrementStudyCount={() =>
-                      progress.incrementStudyCount(topic.id)
-                    }
-                    onDecrementStudyCount={() =>
-                      progress.decrementStudyCount(topic.id)
-                    }
-                    onSetStudyCount={(count) =>
-                      progress.setStudyCount(topic.id, count)
-                    }
-                  />
-                ))}
-              </section>
+                <section key={stage.id} id={stage.id} className="stageSection">
+                  <Card className="stageCard">
+                    <div className="stageNumber">
+                      第 {blockNumber} 块{stageIndex === 1 ? " · 词表" : ""}
+                    </div>
+                    <Title level={2} className="stageTitle">
+                      {stage.title.replace(/^第.+?块(续)?：/, "")}
+                    </Title>
+                    <Paragraph className="stageDescription">
+                      {stage.description}
+                    </Paragraph>
+                  </Card>
+                  {stage.topics.map((topic, topicIndex) => (
+                    <TopicCard
+                      key={topic.id}
+                      topic={topic}
+                      number={
+                        topic.id.startsWith("degree-vocab-unit-")
+                          ? topic.title.match(/^Unit \d+/)?.[0] || ""
+                          : `${blockNumber}.${topicOffset + topicIndex + 1}`
+                      }
+                      getAnnotations={annotations.getAnnotations}
+                      mastered={progress.isMastered(topic.id)}
+                      studyCount={progress.getStudyCount(topic.id)}
+                      wordMastery={
+                        topic.id.startsWith("degree-vocab-unit-")
+                          ? wordMasteryControls
+                          : undefined
+                      }
+                      wordMasteredInUnit={wordMasteredByTopicId[topic.id]}
+                      onToggleMastered={() => handleToggleTopicMastered(topic)}
+                      onIncrementStudyCount={() =>
+                        progress.incrementStudyCount(topic.id)
+                      }
+                      onDecrementStudyCount={() =>
+                        progress.decrementStudyCount(topic.id)
+                      }
+                      onSetStudyCount={(count) =>
+                        progress.setStudyCount(topic.id, count)
+                      }
+                    />
+                  ))}
+                </section>
               );
             })}
           </Content>
@@ -516,6 +611,12 @@ export default function DegreeExamPage() {
             cardSubtitle="动词短语、搭配、语法、完形、阅读，共 8 套卷"
           />
           <DataBackupWidget />
+          <WordMasteryProgress
+            units={wordUnitProgress}
+            totalCount={wordTotalCount}
+            masteredCount={wordMasteredCount}
+            onJump={scrollToElementById}
+          />
           <DoubaoChatWidget />
           <FloatButton.BackTop />
         </Layout>

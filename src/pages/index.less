@@ -3507,6 +3507,326 @@ body {
   display: none;
 }
 
+.wordCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wordStar {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(23, 32, 51, 0.28);
+  cursor: pointer;
+  transition:
+    color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.wordStar:hover {
+  color: #d99a2b;
+  background: rgba(217, 154, 43, 0.14);
+}
+
+.wordStar:active {
+  transform: scale(0.9);
+}
+
+.wordStarActive {
+  color: #d99a2b;
+}
+
+.wordStarActive:hover {
+  color: #b45309;
+}
+
+.wordMasteredTag {
+  border-color: rgba(47, 143, 131, 0.24);
+  background: rgba(47, 143, 131, 0.1);
+  color: #226960;
+  font-weight: 700;
+}
+
+.wordMasteryWidget {
+  position: fixed;
+  right: 24px;
+  bottom: 314px;
+  z-index: 948;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.wordMasteryTrigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 172px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(217, 154, 43, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.92);
+  box-shadow:
+    0 10px 24px rgba(23, 32, 51, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #7a4d10;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.wordMasteryTrigger:hover {
+  transform: translateY(-1px);
+  background: rgba(252, 250, 244, 0.98);
+  box-shadow:
+    0 14px 28px rgba(23, 32, 51, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.wordMasteryTriggerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(217, 154, 43, 0.18);
+  color: #d99a2b;
+}
+
+.wordMasteryTriggerLabel {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.wordMasteryTriggerCount {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(217, 154, 43, 0.16);
+  color: #b45309;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 26px;
+  text-align: center;
+}
+
+.wordMasteryCard {
+  display: flex;
+  flex-direction: column;
+  width: min(340px, calc(100vw - 48px));
+  max-height: min(560px, calc(100vh - 160px));
+  padding: 16px;
+  border: 1px solid rgba(217, 154, 43, 0.18);
+  border-radius: 20px;
+  background: rgba(255, 253, 247, 0.98);
+  box-shadow: 0 24px 60px rgba(23, 32, 51, 0.16);
+  backdrop-filter: blur(18px);
+}
+
+.wordMasteryHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.wordMasteryHeaderMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wordMasteryTitle {
+  font-size: 15px;
+  color: #172033;
+}
+
+.wordMasterySubtitle {
+  font-size: 12px;
+  color: rgba(23, 32, 51, 0.56);
+}
+
+.wordMasteryClose {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.06);
+  color: rgba(23, 32, 51, 0.6);
+  cursor: pointer;
+}
+
+.wordMasteryClose:hover {
+  background: rgba(23, 32, 51, 0.12);
+}
+
+.wordMasteryGauge {
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(247, 239, 224, 0.9),
+    rgba(255, 250, 240, 0.86)
+  );
+  border: 1px solid rgba(217, 154, 43, 0.16);
+}
+
+.wordMasteryGaugePercent {
+  color: #b45309;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.wordMasteryGaugePercentSign {
+  margin-left: 2px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.wordMasteryGaugeTrack {
+  overflow: hidden;
+  height: 8px;
+  margin: 10px 0 8px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.08);
+}
+
+.wordMasteryGaugeFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d99a2b, #f0c069);
+  transition: width 0.24s ease;
+}
+
+.wordMasteryGaugeMeta {
+  font-size: 12px;
+  color: rgba(23, 32, 51, 0.56);
+}
+
+.wordMasteryUnits {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.wordMasteryUnitsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(23, 32, 51, 0.66);
+}
+
+.wordMasteryUnitsHint {
+  font-weight: 500;
+  color: rgba(23, 32, 51, 0.4);
+}
+
+.wordMasteryUnitList {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wordMasteryUnit {
+  appearance: none;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+.wordMasteryUnit:hover {
+  border-color: rgba(217, 154, 43, 0.36);
+  background: rgba(255, 250, 240, 0.9);
+}
+
+.wordMasteryUnitDone {
+  border-color: rgba(47, 143, 131, 0.32);
+  background: rgba(47, 143, 131, 0.08);
+}
+
+.wordMasteryUnitTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.wordMasteryUnitTitle {
+  overflow: hidden;
+  color: #172033;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wordMasteryUnitCount {
+  flex: 0 0 auto;
+  color: rgba(23, 32, 51, 0.56);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.wordMasteryUnitTrack {
+  display: block;
+  overflow: hidden;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.08);
+}
+
+.wordMasteryUnitFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2f8f83, #7dcfbe);
+  transition: width 0.24s ease;
+}
+
 @media (max-width: 960px) {
   .pageShell {
     display: block;
@@ -3589,6 +3909,22 @@ body {
   .dataBackupCard {
     width: 100%;
     max-height: min(560px, calc(100vh - 200px));
+  }
+
+  .wordMasteryWidget {
+    right: 16px;
+    bottom: 312px;
+    left: 16px;
+    align-items: stretch;
+  }
+
+  .wordMasteryTrigger {
+    width: 100%;
+  }
+
+  .wordMasteryCard {
+    width: 100%;
+    max-height: min(520px, calc(100vh - 200px));
   }
 
   .quizCard {
