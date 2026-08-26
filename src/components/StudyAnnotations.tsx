@@ -106,6 +106,7 @@ const DB_VERSION = 1;
 const TOOLBAR_ESTIMATED_HEIGHT = 104;
 const TOOLBAR_SELECTION_GAP = 14;
 const NOTE_MAX_LENGTH = 280;
+const TOOLBAR_VIEWPORT_EDGE_GAP = 24;
 
 type StoreName = "annotations" | "dictionary";
 
@@ -379,18 +380,19 @@ export function useStudyAnnotations(pageKey: string) {
       const rect = range.getBoundingClientRect();
       const toolbarTop =
         rect.top > TOOLBAR_ESTIMATED_HEIGHT + TOOLBAR_SELECTION_GAP
-          ? rect.top +
-            window.scrollY -
-            TOOLBAR_ESTIMATED_HEIGHT -
-            TOOLBAR_SELECTION_GAP
-          : rect.bottom + window.scrollY + TOOLBAR_SELECTION_GAP;
+          ? rect.top - TOOLBAR_ESTIMATED_HEIGHT - TOOLBAR_SELECTION_GAP
+          : rect.bottom + TOOLBAR_SELECTION_GAP;
+      const toolbarLeft = Math.min(
+        window.innerWidth - TOOLBAR_VIEWPORT_EDGE_GAP,
+        Math.max(TOOLBAR_VIEWPORT_EDGE_GAP, rect.left + rect.width / 2),
+      );
 
       setSelection({
         targetId: startElement.dataset.markableId || "",
         start: normalizedStart,
         end: normalizedEnd,
         top: toolbarTop,
-        left: rect.left + window.scrollX + rect.width / 2,
+        left: toolbarLeft,
         text: range.toString().trim(),
       });
     };
