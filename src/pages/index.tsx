@@ -695,6 +695,24 @@ export default function GrammarHome() {
             </Button>
           </aside>
 
+          <div className="degreePaperEntryWidget" aria-label="正式卷入口">
+            <button
+              type="button"
+              className="degreePaperEntryTrigger"
+              onClick={() => {
+                goToRoute("/degree-exam-papers");
+              }}
+            >
+              <span className="degreePaperEntryIcon">
+                <BookOpen size={16} />
+              </span>
+              <span className="degreePaperEntryLabel">
+                英语（专升本）正式卷
+              </span>
+              <span className="degreePaperEntryArrow">→</span>
+            </button>
+          </div>
+
           <AnnotationToolbar
             selection={annotations.selection}
             applyAnnotation={annotations.applyAnnotation}

@@ -501,6 +501,22 @@ export default function DegreeExamPage() {
               </span>
             </div>
 
+            <div className="routeCard routeCardAction">
+              <BookOpen size={20} />
+              <span>
+                正式卷已经独立出来了。现在可以直接进入
+                `英语（专升本）正式卷` 页面查看整卷，不会覆盖当前知识点练习卷。
+              </span>
+              <Button
+                type="primary"
+                onClick={() => {
+                  goToRoute("/degree-exam-papers");
+                }}
+              >
+                查看正式试卷
+              </Button>
+            </div>
+
             {degreeExamStages.map((stage, stageIndex) => {
               const topicOffset = degreeExamStages
                 .slice(0, stageIndex)

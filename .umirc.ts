@@ -25,6 +25,10 @@ export default defineConfig({
       path: "/degree-exam",
       component: "@/pages/degree-exam",
     },
+    {
+      path: "/degree-exam-papers",
+      component: "@/pages/degree-exam-papers",
+    },
   ],
   mfsu: false,
   title: "英语系统知识库",
