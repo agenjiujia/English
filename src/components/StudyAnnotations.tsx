@@ -26,7 +26,7 @@ type AnnotationStyle = {
   note?: string;
 };
 
-type Annotation = AnnotationStyle & {
+export type Annotation = AnnotationStyle & {
   id: string;
   targetId: string;
   start: number;

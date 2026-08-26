@@ -17,6 +17,10 @@ import type {
   DegreeExamSection,
 } from "@/data/degreeExamFullPapers";
 import {
+  MarkableText,
+  type Annotation,
+} from "@/components/StudyAnnotations";
+import {
   scoreEssayWithOpenAICompatible,
   type EssayScoringConfig,
   type EssayScoringResult,
@@ -258,8 +262,10 @@ function calculatePaperReport(
 
 export function DegreeExamPaperPanel({
   papers,
+  getAnnotations,
 }: {
   papers: DegreeExamPaper[];
+  getAnnotations?: (targetId: string) => Annotation[];
 }) {
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
@@ -350,8 +356,27 @@ export function DegreeExamPaperPanel({
     essayScoringConfig.endpoint.trim() && essayScoringConfig.model.trim(),
   );
 
+  const renderMarkableText = React.useCallback(
+    (targetId: string, text: string) => {
+      if (!getAnnotations) return text;
+      return (
+        <MarkableText
+          id={targetId}
+          text={text}
+          annotations={getAnnotations(targetId)}
+        />
+      );
+    },
+    [getAnnotations],
+  );
+
   const updatePaperAnswer = React.useCallback(
     (paperId: string, questionId: string, value: string) => {
+      const selectedText =
+        typeof window !== "undefined"
+          ? window.getSelection?.()?.toString().trim() || ""
+          : "";
+      if (selectedText) return;
       setState((current) => {
         if (current.submitted[paperId]) return current;
         return {
@@ -842,12 +867,15 @@ export function DegreeExamPaperPanel({
 
               {section.material?.length ? (
                 <div className="degreePaperMaterial">
-                  {section.material.map((paragraph) => (
+                  {section.material.map((paragraph, index) => (
                     <Paragraph
-                      key={paragraph}
+                      key={`${section.id}-material-${index}`}
                       className="degreePaperMaterialText"
                     >
-                      {paragraph}
+                      {renderMarkableText(
+                        `${activePaper.id}-${section.id}-material-${index}`,
+                        paragraph,
+                      )}
                     </Paragraph>
                   ))}
                 </div>
@@ -861,7 +889,10 @@ export function DegreeExamPaperPanel({
                       key={`${section.id}-translation-${index}`}
                       className="degreePaperMaterialTranslationText"
                     >
-                      {paragraph}
+                      {renderMarkableText(
+                        `${activePaper.id}-${section.id}-translation-${index}`,
+                        paragraph,
+                      )}
                     </Paragraph>
                   ))}
                 </div>
@@ -871,8 +902,13 @@ export function DegreeExamPaperPanel({
                 <div className="degreePaperAssistant">
                   <Text strong>{section.assistantTitle || "提示"}</Text>
                   <ul className="degreePaperAssistantList">
-                    {section.assistantItems.map((item) => (
-                      <li key={item}>{item}</li>
+                    {section.assistantItems.map((item, index) => (
+                      <li key={`${section.id}-assistant-${index}`}>
+                        {renderMarkableText(
+                          `${activePaper.id}-${section.id}-assistant-${index}`,
+                          item,
+                        )}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -908,12 +944,18 @@ export function DegreeExamPaperPanel({
                         </span>
                         <div className="degreePaperQuestionMain">
                           <Paragraph className="degreePaperQuestionPrompt">
-                            {question.prompt}
+                            {renderMarkableText(
+                              `${activePaper.id}-${section.id}-${question.id}-prompt`,
+                              question.prompt,
+                            )}
                           </Paragraph>
                           <div className="degreePaperQuestionTranslation">
                             <Text strong>题干翻译：</Text>
                             <Paragraph className="degreePaperQuestionTranslationText">
-                              {question.analysis.translation}
+                              {renderMarkableText(
+                                `${activePaper.id}-${section.id}-${question.id}-translation`,
+                                question.analysis.translation,
+                              )}
                             </Paragraph>
                           </div>
 
@@ -957,7 +999,12 @@ export function DegreeExamPaperPanel({
                                     <span className="degreePaperAnswerOptionLabel">
                                       {option.label}
                                     </span>
-                                    <span>{option.text}</span>
+                                    <span>
+                                      {renderMarkableText(
+                                        `${activePaper.id}-${section.id}-${question.id}-option-${option.label}`,
+                                        option.text,
+                                      )}
+                                    </span>
                                   </button>
                                 );
                               })}
@@ -1096,8 +1143,12 @@ export function DegreeExamPaperPanel({
                                 {correct ? "回答正确" : "回答错误"}
                               </Text>
                               <Paragraph className="degreePaperJudgeText">
-                                你的答案：{userAnswer || "未作答"}；标准答案：
-                                {getCanonicalAnswer(question)}
+                                {renderMarkableText(
+                                  `${activePaper.id}-${section.id}-${question.id}-judge-result`,
+                                  `你的答案：${
+                                    userAnswer || "未作答"
+                                  }；标准答案：${getCanonicalAnswer(question)}`,
+                                )}
                               </Paragraph>
                             </div>
                           ) : null}
@@ -1109,19 +1160,28 @@ export function DegreeExamPaperPanel({
                           <div className="degreePaperDetailGroup">
                             <Text strong>标准答案</Text>
                             <Paragraph className="degreePaperDetailText">
-                              {question.analysis.answer}
+                              {renderMarkableText(
+                                `${activePaper.id}-${section.id}-${question.id}-answer`,
+                                question.analysis.answer,
+                              )}
                             </Paragraph>
                           </div>
                           <div className="degreePaperDetailGroup">
                             <Text strong>考点讲解</Text>
                             <Paragraph className="degreePaperDetailText">
-                              {question.analysis.point}
+                              {renderMarkableText(
+                                `${activePaper.id}-${section.id}-${question.id}-point`,
+                                question.analysis.point,
+                              )}
                             </Paragraph>
                           </div>
                           <div className="degreePaperDetailGroup">
                             <Text strong>易错答案</Text>
                             <Paragraph className="degreePaperDetailText">
-                              {question.analysis.pitfalls}
+                              {renderMarkableText(
+                                `${activePaper.id}-${section.id}-${question.id}-pitfalls`,
+                                question.analysis.pitfalls,
+                              )}
                             </Paragraph>
                           </div>
                         </div>

@@ -10,6 +10,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { quizPapers, type QuizPaper } from "@/data/quizPapers";
+import { MarkableText, type Annotation } from "@/components/StudyAnnotations";
 
 const STORAGE_PREFIX = "english-quiz";
 
@@ -43,12 +44,14 @@ export function QuizPanel({
   triggerLabel = "试卷",
   cardTitle = "巩固测验",
   cardSubtitle = "覆盖知识点 1-36，选一份开始",
+  getAnnotations,
 }: {
   pageKey?: string;
   papers?: QuizPaper[];
   triggerLabel?: string;
   cardTitle?: string;
   cardSubtitle?: string;
+  getAnnotations?: (targetId: string) => Annotation[];
 }) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
@@ -137,6 +140,11 @@ export function QuizPanel({
 
   const handleSelectOption = React.useCallback(
     (paperId: string, questionId: string, optionIndex: number) => {
+      const selectedText =
+        typeof window !== "undefined"
+          ? window.getSelection?.()?.toString().trim() || ""
+          : "";
+      if (selectedText) return;
       setState((current) => {
         if (current.graded[paperId]) return current;
         return {
@@ -180,6 +188,25 @@ export function QuizPanel({
     ? getPaperScore(activePaper.id)
     : { correct: 0, total: 0 };
   const wrongCount = activeScore.total - activeScore.correct;
+
+  const renderMarkableText = React.useCallback(
+    (targetId: string, text: string, className?: string) => {
+      if (!getAnnotations) {
+        return className ? <span className={className}>{text}</span> : text;
+      }
+
+      const content = (
+        <MarkableText
+          id={targetId}
+          text={text}
+          annotations={getAnnotations(targetId)}
+        />
+      );
+
+      return className ? <span className={className}>{content}</span> : content;
+    },
+    [getAnnotations],
+  );
 
   return (
     <div
@@ -341,8 +368,7 @@ export function QuizPanel({
                   activeGraded &&
                   selected !== undefined &&
                   selected !== question.answer;
-                const isUnanswered =
-                  activeGraded && selected === undefined;
+                const isUnanswered = activeGraded && selected === undefined;
                 return (
                   <div
                     key={question.id}
@@ -354,7 +380,11 @@ export function QuizPanel({
                   >
                     <div className="quizQuestionStem">
                       <span className="quizQuestionIndex">{index + 1}</span>
-                      <span className="quizQuestionText">{question.stem}</span>
+                      {renderMarkableText(
+                        `${pageKey}-${activePaper.id}-${question.id}-stem`,
+                        question.stem,
+                        "quizQuestionText",
+                      )}
                     </div>
                     <div className="quizOptionList">
                       {question.options.map((option, optionIndex) => {
@@ -384,7 +414,11 @@ export function QuizPanel({
                             <span className="quizOptionMark">
                               {String.fromCharCode(65 + optionIndex)}
                             </span>
-                            <span className="quizOptionText">{option}</span>
+                            {renderMarkableText(
+                              `${pageKey}-${activePaper.id}-${question.id}-option-${optionIndex}`,
+                              option,
+                              "quizOptionText",
+                            )}
                             {activeGraded && isAnswer ? (
                               <CheckCircle2
                                 size={16}
@@ -404,7 +438,10 @@ export function QuizPanel({
                     {activeGraded ? (
                       <div className="quizExplanation">
                         <span className="quizExplanationLabel">解析</span>
-                        {question.explanation}
+                        {renderMarkableText(
+                          `${pageKey}-${activePaper.id}-${question.id}-explanation`,
+                          question.explanation,
+                        )}
                       </div>
                     ) : null}
                   </div>

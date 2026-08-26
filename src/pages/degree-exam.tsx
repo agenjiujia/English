@@ -625,6 +625,7 @@ export default function DegreeExamPage() {
             triggerLabel="真题练习"
             cardTitle="学位英语真题练习"
             cardSubtitle="动词短语、搭配、语法、完形、阅读，共 8 套卷"
+            getAnnotations={annotations.getAnnotations}
           />
           <DataBackupWidget />
           <WordMasteryProgress
